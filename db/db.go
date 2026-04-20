@@ -53,6 +53,8 @@ func InitSchema(db *sql.DB) error {
 		title TEXT NOT NULL,
 		content TEXT,
 		owner_id INTEGER,
+		share_token TEXT UNIQUE,
+		share_password TEXT,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY(owner_id) REFERENCES users(id)
@@ -78,7 +80,23 @@ func InitSchema(db *sql.DB) error {
 		FOREIGN KEY(document_id) REFERENCES documents(id),
 		FOREIGN KEY(user_id) REFERENCES users(id)
 	);
+
+	CREATE TABLE IF NOT EXISTS document_files (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		document_id INTEGER NOT NULL,
+		file_name TEXT NOT NULL,
+		file_path TEXT NOT NULL,
+		mime_type TEXT,
+		file_size INTEGER,
+		uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY(document_id) REFERENCES documents(id)
+	);
 	`
-	_, err := db.Exec(schema)
-	return err
+	if _, err := db.Exec(schema); err != nil {
+		return err
+	}
+	// Safely migrate existing databases — ignore errors if columns already exist
+	db.Exec(`ALTER TABLE documents ADD COLUMN share_token TEXT`)
+	db.Exec(`ALTER TABLE documents ADD COLUMN share_password TEXT`)
+	return nil
 }

@@ -26,9 +26,212 @@
         </div>
     </div>
 
+    <!-- File Attachments Section -->
+    <div class="attachments-section">
+        <div class="attachments-header">
+            <h3 class="attachments-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                </svg>
+                Attachments{{ if .Files }} ({{ len .Files }}){{ end }}
+            </h3>
+        </div>
+
+        {{ if .Files }}
+        <ul class="file-list">
+            {{ range .Files }}
+            <li class="file-chip">
+                <span class="file-chip-icon">{{ .Icon }}</span>
+                <div class="file-chip-info">
+                    <span class="file-chip-name">{{ .FileName }}</span>
+                    <span class="file-chip-meta">{{ .FileSize }} · {{ .UploadedAt }}</span>
+                </div>
+                <div class="file-chip-actions">
+                    <a href="/files/download?file_id={{ .ID }}" class="btn btn-ghost btn-sm" title="Download">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </a>
+                    <form method="POST" action="/documents/delete-file" style="display:inline;">
+                        <input type="hidden" name="file_id" value="{{ .ID }}">
+                        <input type="hidden" name="document_id" value="{{ $.Document.ID }}">
+                        <button type="submit" class="btn btn-ghost btn-sm text-danger" title="Delete file"
+                            onclick="return confirm('Delete this file?')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                <path d="M10 11v6"/>
+                                <path d="M14 11v6"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </li>
+            {{ end }}
+        </ul>
+        {{ end }}
+
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="upload-zone">
+            <form method="POST" action="/documents/upload" enctype="multipart/form-data" id="upload-form">
+                <input type="hidden" name="document_id" value="{{ .Document.ID }}">
+                <input type="file" id="file-input" name="file" class="upload-file-input" onchange="document.getElementById('upload-form').submit()">
+                <label for="file-input" class="upload-zone-label">
+                    <div class="upload-zone-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <span class="upload-zone-text">Click to upload or drag &amp; drop</span>
+                    <span class="upload-zone-hint">Any file type · Max 50 MB</span>
+                </label>
+            </form>
+        </div>
+    </div>
+
+    <!-- Share & Security Panel -->
+    <div class="share-panel">
+        <div class="share-panel-header">
+            <h3 class="share-panel-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="19" r="3"/>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+                Share &amp; Security
+            </h3>
+        </div>
+
+        <div class="share-panel-body">
+            <!-- Share Link -->
+            <div class="share-row">
+                <div class="share-row-info">
+                    <span class="share-row-label">Share Link</span>
+                    <span class="share-row-desc">
+                        {{ if .ShareURL }}Anyone with the link can view this document{{ else }}Generate a public link to share this document{{ end }}
+                    </span>
+                </div>
+                <div class="share-row-actions">
+                    {{ if .ShareURL }}
+                    <div class="share-link-group">
+                        <input type="text" id="share-url-input" class="share-link-input" value="{{ .ShareURL }}" readonly>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="copyShareLink()" id="copy-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                    <form method="POST" action="/documents/share" style="margin-top: var(--space-2);">
+                        <input type="hidden" name="id" value="{{ .Document.ID }}">
+                        <input type="hidden" name="action" value="revoke">
+                        <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--error-500);">Revoke link</button>
+                    </form>
+                    {{ else }}
+                    <form method="POST" action="/documents/share">
+                        <input type="hidden" name="id" value="{{ .Document.ID }}">
+                        <input type="hidden" name="action" value="generate">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                            </svg>
+                            Generate Link
+                        </button>
+                    </form>
+                    {{ end }}
+                </div>
+            </div>
+
+            <!-- Password Protection -->
+            <div class="share-row">
+                <div class="share-row-info">
+                    <span class="share-row-label">
+                        {{ if .IsProtected }}
+                        <span class="badge badge-warning">🔒 Password Protected</span>
+                        {{ else }}
+                        Password Protection
+                        {{ end }}
+                    </span>
+                    <span class="share-row-desc">
+                        {{ if .IsProtected }}Visitors must enter a password to view the shared document{{ else }}Optionally lock shared access behind a password{{ end }}
+                    </span>
+                </div>
+                <div class="share-row-actions">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="togglePasswordForm()" id="pwd-toggle-btn">
+                        {{ if .IsProtected }}Change Password{{ else }}Set Password{{ end }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Password form (hidden by default) -->
+            <div class="password-form-wrapper" id="password-form" style="display:none;">
+                <form method="POST" action="/documents/set-password" class="inline-form">
+                    <input type="hidden" name="id" value="{{ .Document.ID }}">
+                    <div class="inline-form-fields">
+                        <input type="password" name="password" class="form-input" placeholder="{{ if .IsProtected }}New password (leave blank to remove){{ else }}Enter a password...{{ end }}">
+                        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                        <button type="button" class="btn btn-ghost btn-sm" onclick="togglePasswordForm()">Cancel</button>
+                    </div>
+                    {{ if .IsProtected }}
+                    <p class="form-hint">Leave blank to remove password protection.</p>
+                    {{ end }}
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Comments Section -->
     <div class="comments-section" hx-get="/comments?doc_id={{ .Document.ID }}" hx-trigger="load" hx-swap="innerHTML">
         <p class="text-muted">Loading comments...</p>
     </div>
 </div>
+
+<script>
+function copyShareLink() {
+    const input = document.getElementById('share-url-input');
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = '✓ Copied!';
+        btn.style.color = 'var(--success-600)';
+        setTimeout(() => {
+            btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+            btn.style.color = '';
+        }, 2000);
+    });
+}
+
+function togglePasswordForm() {
+    const form = document.getElementById('password-form');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+// Drag and drop support
+const zone = document.getElementById('upload-zone');
+if (zone) {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('upload-zone--active'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('upload-zone--active'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('upload-zone--active');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            const input = document.getElementById('file-input');
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            input.files = dt.files;
+            document.getElementById('upload-form').submit();
+        }
+    });
+}
+</script>
 {{ end }}
