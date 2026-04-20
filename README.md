@@ -16,6 +16,9 @@ DocuFlow delivers a rich collaborative documentation experience while staying si
 - **📝 Markdown-First Editing** - Write documentation using familiar Markdown syntax with live preview
 - **💾 Autosave** - HTMX-powered autosave every 2 seconds while editing
 - **🔄 Version Control** - Complete revision history with one-click rollback to any previous version
+- **📎 File Attachments** - Upload and manage files (PDF, images, docs) directly on documents
+- **🔒 Password Protection** - Secure document access with bcrypt-hashed passwords
+- **🔗 Shareable Links** - Generate unique share tokens for public (or password-gated) document access
 - **💬 Inline Comments** - Threaded discussions directly on documents
 - **🔍 Full-Text Search** - Fast search across all document titles and content
 - **👥 User Authentication** - Secure registration and login with bcrypt password hashing
@@ -53,14 +56,14 @@ Where **correctness**, **auditability**, and **maintainability** matter more tha
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/docuflow.git
+git clone https://github.com/The-honoured1/docuflow.git
 cd docuflow
 
 # Install dependencies
 go mod tidy
 
 # Run the server
-go run ./cmd/server/main.go
+go run main.go
 ```
 
 The server will start on `http://localhost:8080`
@@ -76,20 +79,17 @@ The server will start on `http://localhost:8080`
 
 ```
 docuflow/
-├── cmd/
-│   └── server/
-│       └── main.go              # Application entry point
-├── internal/
-│   ├── db/
-│   │   └── db.go                # Database initialization & schema
-│   ├── handlers/
-│   │   ├── auth.go              # Authentication (register, login, logout)
-│   │   ├── document.go          # Document CRUD & Markdown rendering
-│   │   ├── revision.go          # Version history & rollback
-│   │   ├── comment.go           # Inline comments
-│   │   └── search.go            # Full-text search
-│   └── models/
-│       └── models.go            # Data structures
+├── db/
+│   └── db.go                # Database initialization & schema
+├── handlers/
+│   ├── auth.go              # Authentication (register, login, logout)
+│   ├── document.go          # Document CRUD & Markdown rendering
+│   ├── revision.go          # Version history & rollback
+│   ├── comment.go           # Inline comments
+│   ├── upload.go            # File upload workflow
+│   └── search.go            # Full-text search
+├── models/
+│   └── models.go            # Data structures
 ├── web/
 │   ├── static/
 │   │   └── css/
@@ -97,13 +97,19 @@ docuflow/
 │   └── templates/
 │       ├── base.html            # Base layout
 │       ├── document_*.html      # Document views
+│       ├── share_view.html      # Public share view
 │       ├── login.html           # Authentication
 │       ├── register.html
 │       ├── search.html
 │       ├── revisions.html
 │       └── partials/
 │           └── comments.html    # Comment component
-├── go.mod                       # Go dependencies
+├── .github/
+│   └── workflows/           # CI/CD (CI, Release)
+├── Dockerfile               # Containerization
+├── .gitignore               # Root level ignore
+├── main.go                  # Application entry point
+├── go.mod                   # Go dependencies
 ├── go.sum
 └── README.md
 ```
@@ -139,9 +145,23 @@ CREATE TABLE documents (
     title TEXT NOT NULL,
     content TEXT,
     owner_id INTEGER,
+    share_token TEXT UNIQUE,
+    share_password TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(owner_id) REFERENCES users(id)
+);
+
+-- Document files (attachments)
+CREATE TABLE document_files (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    document_id INTEGER NOT NULL,
+    file_name TEXT NOT NULL,
+    file_path TEXT NOT NULL,
+    mime_type TEXT,
+    file_size INTEGER,
+    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(document_id) REFERENCES documents(id)
 );
 
 -- Revisions table (version history)
@@ -188,39 +208,22 @@ DocuFlow features a premium, industry-standard design system:
 
 ## 🚀 Deployment
 
-### Production Build
+### CI/CD with GitHub Actions
+
+DocuFlow includes two pre-configured workflows:
+- **CI**: Runs on every push to `main` to build and vet code.
+- **Release**: Triggered by version tags (e.g., `v1.0.0`). Compiles binaries for Linux, Windows, and macOS and publishes them to a GitHub Release.
+
+### Docker
+
+Build and run using the optimized multi-stage Dockerfile:
 
 ```bash
-# Build the binary
-go build -o docuflow ./cmd/server/main.go
+# Build
+docker build -t docuflow .
 
-# Run in production
-./docuflow
-```
-
-### Environment Variables
-
-```bash
-# Optional: Configure port (default: 8080)
-PORT=8080 ./docuflow
-```
-
-### Docker (Optional)
-
-```dockerfile
-FROM golang:1.25-alpine AS builder
-WORKDIR /app
-COPY . .
-RUN go mod download
-RUN go build -o docuflow ./cmd/server/main.go
-
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
-COPY --from=builder /app/docuflow .
-COPY --from=builder /app/web ./web
-EXPOSE 8080
-CMD ["./docuflow"]
+# Run
+docker run -p 8080:8080 -v $(pwd)/data:/app/uploads docuflow
 ```
 
 ## 📝 API Routes
@@ -235,6 +238,12 @@ CMD ["./docuflow"]
 | `GET` | `/documents/view?id={id}` | View document |
 | `GET/POST` | `/documents/edit?id={id}` | Edit document |
 | `POST` | `/documents/autosave` | Autosave (HTMX) |
+| `POST` | `/documents/set-password` | Set document protection |
+| `POST` | `/documents/share` | Generate/Revoke share link |
+| `GET` | `/share/{token}` | Public document view |
+| `POST` | `/documents/upload` | Upload attachment |
+| `POST` | `/documents/delete-file` | Remove attachment |
+| `GET` | `/files/download` | Download attachment |
 | `GET` | `/revisions?doc_id={id}` | Revision history |
 | `GET` | `/revisions/view?id={id}` | View revision |
 | `POST` | `/revisions/rollback` | Restore revision |
