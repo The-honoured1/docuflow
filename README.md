@@ -187,7 +187,6 @@ CREATE TABLE comments (
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
 ```
-
 ## 🎨 Design System
 
 DocuFlow features a premium, industry-standard design system:
