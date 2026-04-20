@@ -1180,3 +1180,430 @@ a:hover {
 .htmx-request .htmx-indicator {
     display: inline-block;
 }
+
+/* ============================================
+   FILE ATTACHMENTS
+   ============================================ */
+
+.attachments-section {
+    border-top: 1px solid var(--border-light);
+    padding: var(--space-6);
+}
+
+.attachments-header {
+    margin-bottom: var(--space-4);
+}
+
+.attachments-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4) 0;
+}
+
+.file-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.file-chip {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--gray-50);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-fast);
+}
+
+.file-chip:hover {
+    border-color: var(--border-default);
+    background: var(--surface);
+    box-shadow: var(--shadow-xs);
+}
+
+.file-chip-icon {
+    font-size: 1.375rem;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.file-chip-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.file-chip-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-chip-meta {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+.file-chip-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    flex-shrink: 0;
+}
+
+.text-danger {
+    color: var(--error-500) !important;
+}
+
+.text-danger:hover {
+    color: var(--error-600) !important;
+    background: var(--error-50) !important;
+}
+
+/* Upload Zone */
+.upload-zone {
+    border: 2px dashed var(--border-default);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8) var(--space-6);
+    text-align: center;
+    transition: all var(--transition-base);
+    cursor: pointer;
+    background: var(--gray-25);
+}
+
+.upload-zone:hover,
+.upload-zone--active {
+    border-color: var(--primary-400);
+    background: var(--primary-50);
+}
+
+.upload-zone--active {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-glow);
+}
+
+.upload-file-input {
+    display: none;
+}
+
+.upload-zone-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: pointer;
+}
+
+.upload-zone-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--primary-100);
+    border-radius: var(--radius-2xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+    margin-bottom: var(--space-1);
+    transition: all var(--transition-fast);
+}
+
+.upload-zone:hover .upload-zone-icon {
+    background: var(--primary-200);
+    transform: translateY(-2px);
+}
+
+.upload-zone-text {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.upload-zone-hint {
+    font-size: 0.8125rem;
+    color: var(--text-tertiary);
+}
+
+/* ============================================
+   SHARE & SECURITY PANEL
+   ============================================ */
+
+.share-panel {
+    border-top: 1px solid var(--border-light);
+}
+
+.share-panel-header {
+    padding: var(--space-4) var(--space-6);
+    background: var(--gray-25);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.share-panel-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.share-panel-body {
+    padding: var(--space-2) 0;
+}
+
+.share-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.share-row:last-of-type {
+    border-bottom: none;
+}
+
+.share-row-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    flex: 1;
+}
+
+.share-row-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.share-row-desc {
+    font-size: 0.8125rem;
+    color: var(--text-tertiary);
+}
+
+.share-row-actions {
+    flex-shrink: 0;
+}
+
+.share-link-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.share-link-input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    background: var(--gray-50);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2) var(--space-3);
+    width: 260px;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.share-link-input:focus {
+    outline: none;
+    border-color: var(--primary-400);
+}
+
+.password-form-wrapper {
+    padding: 0 var(--space-6) var(--space-4);
+    animation: fadeIn 0.15s ease-out;
+}
+
+.inline-form-fields {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.inline-form-fields .form-input {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+}
+
+/* ============================================
+   DOCUMENT LIST BADGES
+   ============================================ */
+
+.doc-title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-1);
+    flex-wrap: wrap;
+}
+
+.doc-badges {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.doc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: var(--radius-full);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.doc-badge--shared {
+    background: var(--primary-50);
+    color: var(--primary-700);
+    border: 1px solid var(--primary-200);
+}
+
+.doc-badge--locked {
+    background: var(--warning-50);
+    color: var(--warning-600);
+    border: 1px solid #fde68a;
+}
+
+/* ============================================
+   SHARE GATE (PUBLIC PASSWORD PROMPT)
+   ============================================ */
+
+.share-gate-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+}
+
+.share-gate-card {
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    padding: var(--space-10);
+    width: 100%;
+    max-width: 440px;
+    text-align: center;
+    animation: fadeIn 0.25s ease-out;
+}
+
+.share-gate-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+    display: block;
+}
+
+.share-gate-title {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.share-gate-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    margin-bottom: var(--space-6);
+}
+
+.share-gate-error {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--error-50);
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-lg);
+    color: var(--error-600);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: var(--space-4);
+    text-align: left;
+}
+
+.share-gate-form {
+    text-align: left;
+}
+
+/* ============================================
+   SHARE BANNER (TOP OF SHARED DOCS)
+   ============================================ */
+
+.share-banner {
+    background: linear-gradient(135deg, var(--primary-600), var(--purple-600));
+    border-radius: var(--radius-xl);
+    padding: var(--space-3) var(--space-5);
+    color: white;
+}
+
+.share-banner-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.share-banner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: rgba(255,255,255,0.2);
+    border-radius: var(--radius-full);
+    padding: 4px 12px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.share-banner-text {
+    flex: 1;
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    .share-row {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .share-link-input {
+        width: 100%;
+    }
+
+    .share-link-group {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .inline-form-fields {
+        flex-wrap: wrap;
+    }
+
+    .doc-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

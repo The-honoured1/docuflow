@@ -25,7 +25,30 @@
                 </svg>
             </div>
             <div class="doc-content">
-                <a href="/documents/view?id={{ .ID }}" class="doc-title">{{ .Title }}</a>
+                <div class="doc-title-row">
+                    <a href="/documents/view?id={{ .ID }}" class="doc-title">{{ .Title }}</a>
+                    <div class="doc-badges">
+                        {{ if .IsShared }}
+                        <span class="doc-badge doc-badge--shared" title="Public share link active">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                                <polyline points="16 6 12 2 8 6"/>
+                                <line x1="12" y1="2" x2="12" y2="15"/>
+                            </svg>
+                            Shared
+                        </span>
+                        {{ end }}
+                        {{ if .IsProtected }}
+                        <span class="doc-badge doc-badge--locked" title="Password protected">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                            Protected
+                        </span>
+                        {{ end }}
+                    </div>
+                </div>
                 <span class="doc-meta">Updated {{ .UpdatedAt.Format "Jan 02, 2006 at 15:04" }}</span>
             </div>
             <a href="/documents/edit?id={{ .ID }}" class="btn btn-ghost btn-sm">Edit</a>
