@@ -1,0 +1,22 @@
+# Compiled binaries
+docuflow
+docuflow.exe
+server.exe
+*.exe
+
+# SQLite database (runtime data)
+*.db
+*.db-shm
+*.db-wal
+
+# Uploaded files directory (runtime data)
+uploads/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Go build cache
+/tmp/
