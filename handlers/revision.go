@@ -40,17 +40,19 @@ func (h *RevisionHandler) ListRevisions(w http.ResponseWriter, r *http.Request) 
 	var title string
 	h.DB.QueryRow("SELECT title FROM documents WHERE id = ?", docID).Scan(&title)
 
-	tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/revisions.html"))
+	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 	data := struct {
 		User       string
 		DocumentID string
 		Title      string
 		Revisions  []models.Revision
+		View       string
 	}{
 		User:       GetBaseData(r).User,
 		DocumentID: docID,
 		Title:      title,
 		Revisions:  revisions,
+		View:       "revisions",
 	}
 	tmpl.Execute(w, data)
 }
@@ -72,15 +74,17 @@ func (h *RevisionHandler) ViewRevision(w http.ResponseWriter, r *http.Request) {
 	var title string
 	h.DB.QueryRow("SELECT title FROM documents WHERE id = ?", rev.DocumentID).Scan(&title)
 
-	tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/revision_view.html"))
+	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 	data := struct {
 		User     string
 		Title    string
 		Revision models.Revision
+		View     string
 	}{
 		User:     GetBaseData(r).User,
 		Title:    title,
 		Revision: rev,
+		View:     "revision_view",
 	}
 	tmpl.Execute(w, data)
 }

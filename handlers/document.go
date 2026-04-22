@@ -48,13 +48,14 @@ func (h *DocumentHandler) ListDocuments(w http.ResponseWriter, r *http.Request) 
 		})
 	}
 
-	tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/document_list.html"))
+	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 	tmpl.Execute(w, struct {
 		User      string
 		Documents []DocItem
 	}{
 		User:      GetBaseData(r).User,
 		Documents: docs,
+		View:      "document_list",
 	})
 }
 
@@ -62,7 +63,7 @@ func (h *DocumentHandler) NewDocument(w http.ResponseWriter, r *http.Request) {
 	folderID := r.URL.Query().Get("folder_id")
 
 	if r.Method == "GET" {
-		tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/document_edit.html"))
+		tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 
 		if folderID != "" {
 			// Basic validation/parsing could go here
@@ -72,9 +73,11 @@ func (h *DocumentHandler) NewDocument(w http.ResponseWriter, r *http.Request) {
 			User     string
 			FolderID string
 			models.Document
+			View string
 		}{
 			User:     GetBaseData(r).User,
 			FolderID: folderID,
+			View:     "document_new",
 		})
 		return
 	}
@@ -128,7 +131,7 @@ func (h *DocumentHandler) ViewDocument(w http.ResponseWriter, r *http.Request) {
 		shareURL = fmt.Sprintf("http://%s/share/%s", r.Host, doc.ShareToken)
 	}
 
-	tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/document_view.html"))
+	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 	tmpl.Execute(w, struct {
 		User        string
 		Document    models.Document
@@ -143,6 +146,7 @@ func (h *DocumentHandler) ViewDocument(w http.ResponseWriter, r *http.Request) {
 		Files:       files,
 		ShareURL:    shareURL,
 		IsProtected: doc.SharePassword != "",
+		View:        "document_view",
 	})
 }
 
@@ -156,7 +160,7 @@ func (h *DocumentHandler) EditDocument(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Document not found", http.StatusNotFound)
 			return
 		}
-		tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/document_edit.html"))
+		tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 		tmpl.Execute(w, struct {
 			User string
 			models.Document
@@ -277,7 +281,7 @@ func (h *DocumentHandler) ShareView(w http.ResponseWriter, r *http.Request) {
 			attempt := r.FormValue("share_password")
 			if bcrypt.CompareHashAndPassword([]byte(doc.SharePassword), []byte(attempt)) != nil {
 				// Wrong password — re-show gate with error
-				tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/share_view.html"))
+				tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 				tmpl.Execute(w, struct {
 					Title     string
 					ShowGate  bool
@@ -305,7 +309,7 @@ func (h *DocumentHandler) ShareView(w http.ResponseWriter, r *http.Request) {
 		// GET: check if already unlocked via cookie
 		if _, err := r.Cookie("share_" + token); err != nil {
 			// Show password gate
-			tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/share_view.html"))
+			tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 			tmpl.Execute(w, struct {
 				Title     string
 				ShowGate  bool
@@ -327,7 +331,7 @@ func (h *DocumentHandler) ShareView(w http.ResponseWriter, r *http.Request) {
 
 	files, _ := GetDocumentFiles(h.DB, fmt.Sprintf("%d", doc.ID))
 
-	tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/share_view.html"))
+	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 	tmpl.Execute(w, struct {
 		Title    string
 		ShowGate bool

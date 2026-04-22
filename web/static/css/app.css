@@ -1,0 +1,190 @@
+/* 
+    DocuFlow Elite - Titanium & Electric Indigo
+    Design: Antigravity
+    A minimalist, ultra-premium UI for high-end knowledge management.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+    --bg: #030712;
+    --surface: #0f172a;
+    --primary: #6366f1;
+    --primary-glow: rgba(99, 102, 241, 0.2);
+    --accent: #f43f5e;
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: rgba(255, 255, 255, 0.05);
+    --glass: rgba(15, 23, 42, 0.7);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
+}
+
+/* Elite Layout */
+.elite-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.elite-sidebar {
+    width: 320px;
+    background: var(--glass);
+    backdrop-filter: blur(40px);
+    border-right: 1px solid var(--border);
+    padding: 48px 32px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+}
+
+.elite-content {
+    flex: 1;
+    margin-left: 320px;
+    padding: 80px 100px;
+}
+
+/* Brand */
+.brand {
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 64px;
+}
+
+/* Nav */
+.nav-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nav-item {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 16px;
+    border-radius: 16px;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.nav-item:hover, .nav-item.active {
+    background: var(--surface);
+    color: var(--text);
+    border-color: var(--border);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item.active i {
+    color: var(--primary);
+}
+
+/* Content Area */
+.view-header {
+    margin-bottom: 64px;
+}
+
+.view-title {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 16px;
+}
+
+.view-subtitle {
+    font-size: 18px;
+    color: var(--text-muted);
+}
+
+/* Cards & Grid */
+.elite-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 32px;
+}
+
+.elite-card {
+    background: var(--surface);
+    border-radius: 28px;
+    padding: 40px;
+    border: 1px solid var(--border);
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.elite-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 40px 60px -20px rgba(0, 0, 0, 0.6);
+    border-color: var(--primary);
+}
+
+.elite-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle at top right, var(--primary-glow), transparent);
+}
+
+/* Buttons */
+.btn-elite {
+    background: var(--primary);
+    color: white;
+    padding: 18px 40px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 20px 40px -10px var(--primary-glow);
+}
+
+.btn-elite:hover {
+    transform: scale(1.02);
+    box-shadow: 0 25px 50px -12px var(--primary-glow);
+}
+
+/* Markdown Surface */
+.markdown-surface {
+    background: var(--surface);
+    padding: 80px;
+    border-radius: 40px;
+    border: 1px solid var(--border);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade {
+    animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}

@@ -50,9 +50,9 @@ func (h *CommentHandler) ListComments(w http.ResponseWriter, r *http.Request) {
 		comments = append(comments, c)
 	}
 
-	// Return HTML partial for HTMX
-	tmpl := template.Must(template.ParseFiles("web/templates/partials/comments.html"))
-	tmpl.Execute(w, struct {
+	// Return HTML partial from the unified template
+	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
+	tmpl.ExecuteTemplate(w, "comments", struct {
 		DocumentID string
 		Comments   []Comment
 	}{
