@@ -52,6 +52,7 @@ func (h *SearchHandler) Search(w http.ResponseWriter, r *http.Request) {
 		results = append(results, d)
 	}
 
+	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 	tmpl.Execute(w, struct {
 		User    string
 		Query   string

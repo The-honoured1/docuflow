@@ -52,6 +52,7 @@ func (h *DocumentHandler) ListDocuments(w http.ResponseWriter, r *http.Request) 
 	tmpl.Execute(w, struct {
 		User      string
 		Documents []DocItem
+		View      string
 	}{
 		User:      GetBaseData(r).User,
 		Documents: docs,
@@ -139,6 +140,7 @@ func (h *DocumentHandler) ViewDocument(w http.ResponseWriter, r *http.Request) {
 		Files       []map[string]interface{}
 		ShareURL    string
 		IsProtected bool
+		View        string
 	}{
 		User:        GetBaseData(r).User,
 		Document:    doc,
@@ -164,9 +166,11 @@ func (h *DocumentHandler) EditDocument(w http.ResponseWriter, r *http.Request) {
 		tmpl.Execute(w, struct {
 			User string
 			models.Document
+			View string
 		}{
 			User:     GetBaseData(r).User,
 			Document: doc,
+			View:     "document_edit",
 		})
 		return
 	}

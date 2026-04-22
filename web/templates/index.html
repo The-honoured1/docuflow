@@ -3,150 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DocuFlow Elite</title>
+    <title>DocuFlow | Nexus</title>
     <link rel="stylesheet" href="/static/css/app.css">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="animate-fade">
-    {{ if or (eq .View "login") (eq .View "register") }}
-    <!-- Auth View -->
-    <div class="auth-wrapper" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: radial-gradient(circle at center, #0f172a, #030712);">
-        <div class="elite-card" style="width: 100%; max-width: 480px; padding: 64px;">
-            <div class="brand" style="text-align: center;">D</div>
-            <h1 class="view-title" style="text-align: center; font-size: 32px;">{{ if eq .View "login" }}Welcome Back{{ else }}Initialize ID{{ end }}</h1>
-            <p class="view-subtitle" style="text-align: center; margin-bottom: 48px;">{{ if eq .View "login" }}Enter the DocuFlow Nexus{{ else }}Create your knowledge profile{{ end }}</p>
+<body class="fade-in-up">
+    <!-- Aurora Backdrop -->
+    <div class="aurora-bg">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+    </div>
 
-            <form action="/{{ .View }}" method="POST" style="display: flex; flex-direction: column; gap: 24px;">
+    {{ if or (eq .View "login") (eq .View "register") }}
+    <div class="auth-nexus">
+        <div class="auth-card glass-panel fade-in-up">
+            <div class="brand" style="justify-content: center; margin-bottom: 32px;">
+                <div class="brand-dot"></div>
+                DocuFlow
+            </div>
+            <h1 style="font-size: 32px; margin-bottom: 12px; font-weight: 800; letter-spacing: -0.03em;">{{ if eq .View "login" }}Welcome Back{{ else }}Initialize Profile{{ end }}</h1>
+            <p style="color: var(--text-dim); margin-bottom: 48px; font-weight: 500;">{{ if eq .View "login" }}Enter the Nexus to access your knowledge.{{ else }}Create your unique identity in the flow.{{ end }}</p>
+
+            <form action="/{{ .View }}" method="POST" style="display: flex; flex-direction: column; gap: 20px; text-align: left;">
                 <div class="form-group">
-                    <label style="display: block; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); margin-bottom: 12px;">ID / Username</label>
-                    <input type="text" name="username" class="btn-elite" style="background: var(--bg); border: 1px solid var(--border); width: 100%; text-align: left; padding: 16px 24px; font-weight: 400;" placeholder="e.g. neuro_architect" required>
+                    <label style="display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); margin-bottom: 12px; margin-left: 4px;">Access ID</label>
+                    <input type="text" name="username" class="search-field" style="width: 100%; height: 56px; border-radius: 16px;" placeholder="e.g. neuro_architect" required>
                 </div>
                 {{ if eq .View "register" }}
                 <div class="form-group">
-                    <label style="display: block; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); margin-bottom: 12px;">Email Endpoint</label>
-                    <input type="email" name="email" class="btn-elite" style="background: var(--bg); border: 1px solid var(--border); width: 100%; text-align: left; padding: 16px 24px; font-weight: 400;" placeholder="architect@nebula.io" required>
+                    <label style="display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); margin-bottom: 12px; margin-left: 4px;">Email Endpoint</label>
+                    <input type="email" name="email" class="search-field" style="width: 100%; height: 56px; border-radius: 16px;" placeholder="architect@nebula.io" required>
                 </div>
                 {{ end }}
                 <div class="form-group">
-                    <label style="display: block; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); margin-bottom: 12px;">Secure Passcode</label>
-                    <input type="password" name="password" class="btn-elite" style="background: var(--bg); border: 1px solid var(--border); width: 100%; text-align: left; padding: 16px 24px; font-weight: 400;" placeholder="••••••••••••" required>
+                    <label style="display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); margin-bottom: 12px; margin-left: 4px;">Secure Passcode</label>
+                    <input type="password" name="password" class="search-field" style="width: 100%; height: 56px; border-radius: 16px;" placeholder="••••••••••••" required>
                 </div>
-                <button type="submit" class="btn-elite" style="margin-top: 12px;">{{ if eq .View "login" }}Access Neural Drive{{ else }}Join Nexus{{ end }}</button>
+                <button type="submit" class="btn-premium" style="width: 100%; height: 60px; border-radius: 18px; margin-top: 12px; font-size: 17px;">
+                    {{ if eq .View "login" }}Access Nexus{{ else }}Create Identity{{ end }}
+                    <i data-lucide="arrow-right" size="18"></i>
+                </button>
             </form>
 
-            <div style="margin-top: 40px; text-align: center; font-size: 14px; color: var(--text-muted);">
+            <p style="margin-top: 32px; font-size: 14px; font-weight: 500; color: var(--text-dim);">
                 {{ if eq .View "login" }}
-                First time? <a href="/register" style="color: var(--primary); font-weight: 700;">Generate ID</a>
+                No Identity found? <a href="/register" style="color: var(--text); font-weight: 700;">Generate one.</a>
                 {{ else }}
-                Have an ID? <a href="/login" style="color: var(--primary); font-weight: 700;">Vault Login</a>
+                Identity exists? <a href="/login" style="color: var(--text); font-weight: 700;">Enter Vault.</a>
                 {{ end }}
-            </div>
+            </p>
         </div>
     </div>
     {{ else }}
-    <!-- Main Elite Layout -->
     <div class="elite-container">
-        <aside class="elite-sidebar">
-            <div class="brand">DocuFlow</div>
-            <nav>
+        <aside class="elite-sidebar glass-panel">
+            <div class="brand">
+                <div class="brand-dot"></div>
+                DocuFlow
+            </div>
+            <nav style="flex: 1;">
                 <ul class="nav-list">
-                    <a href="/"><li class="nav-item {{ if eq .View "drive" }}active{{ end }}"><i data-lucide="layout-grid"></i> Drive</li></a>
-                    <a href="/recent"><li class="nav-item"><i data-lucide="zap"></i> Recent</li></a>
-                    <a href="/starred"><li class="nav-item"><i data-lucide="star"></i> Starred</li></a>
-                    <a href="/trash"><li class="nav-item"><i data-lucide="trash"></i> Archive</li></a>
+                    <a href="/" class="nav-link"><li class="nav-item {{ if eq .View "drive" }}active{{ end }}"><i data-lucide="layers" size="20"></i> Neural Drive</li></a>
+                    <a href="/recent" class="nav-link"><li class="nav-item"><i data-lucide="zap" size="20"></i> Recent Flow</li></a>
+                    <a href="/starred" class="nav-link"><li class="nav-item"><i data-lucide="star" size="20"></i> Starred Space</li></a>
+                    <a href="/trash" class="nav-link"><li class="nav-item"><i data-lucide="archive" size="20"></i> Archive Vault</li></a>
                 </ul>
             </nav>
-            
-            <div class="user-block" style="margin-top: auto; padding-top: 40px; border-top: 1px solid var(--border);">
-                <div class="nav-item" style="cursor: default;">
+
+            <div class="user-anchor" style="padding-top: 40px; border-top: 1px solid var(--glass-border);">
+                <div class="nav-item glass-panel" style="background: rgba(255,255,255,0.02); border-radius: 16px; margin-bottom: 8px;">
                     <div style="width: 40px; height: 40px; border-radius: 12px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; color: white;">
                         {{ if .User }}{{ slice .User 0 1 }}{{ else }}?{{ end }}
                     </div>
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; font-size: 14px;">{{ .User }}</div>
-                        <div style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase;">Elite Member</div>
+                    <div style="flex: 1; overflow: hidden;">
+                        <div style="font-weight: 700; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ .User }}</div>
+                        <div style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Pro Member</div>
                     </div>
-                    <a href="/logout" style="color: var(--text-muted);"><i data-lucide="log-out" size="14"></i></a>
+                    <a href="/logout" style="color: var(--text-dim);"><i data-lucide="log-out" size="14"></i></a>
                 </div>
             </div>
         </aside>
 
         <main class="elite-content">
-            <div class="top-actions" style="display: flex; justify-content: flex-end; margin-bottom: 40px; gap: 16px;">
-                 <form action="/search" method="GET" style="flex: 1; max-width: 400px; margin-right: auto;">
-                    <input type="text" name="q" placeholder="Search Knowledge..." style="width: 100%; padding: 12px 24px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); color: white; outline: none; transition: 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">
+            <header class="top-bar">
+                <form action="/search" method="GET" style="flex: 1; max-width: 500px;">
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <i data-lucide="search" size="18" style="position: absolute; left: 16px; color: var(--text-dim);"></i>
+                        <input type="text" name="q" class="search-field" style="padding-left: 48px;" placeholder="Search Consciousness...">
+                    </div>
                 </form>
-                <a href="/documents/new{{ if .CurrentFolderID }}?folder_id={{ .CurrentFolderID }}{{ end }}" class="btn-elite" style="padding: 12px 24px; border-radius: 14px; font-size: 14px;">+ New Intelligence</a>
-            </div>
-
-            {{ if eq .View "drive" }}
-                <div class="view-header">
-                    <h1 class="view-title">{{ if .CurrentFolderName }}{{ .CurrentFolderName }}{{ else }}Neural Drive{{ end }}</h1>
-                    <p class="view-subtitle">Organizing your digital consciousness.</p>
+                <div class="top-actions" style="display: flex; gap: 16px;">
+                    <button class="btn-premium btn-secondary" style="width: 52px; padding: 0; justify-content: center;"><i data-lucide="bell" size="20"></i></button>
+                    <a href="/documents/new{{ if .CurrentFolderID }}?folder_id={{ .CurrentFolderID }}{{ end }}" class="btn-premium">
+                        <i data-lucide="plus" size="20"></i>
+                        New Intelligence
+                    </a>
                 </div>
-                <div class="elite-grid">
+            </header>
+
+            {{ if or (eq .View "drive") (eq .View "document_list") }}
+                <div class="view-intro fade-in-up" style="margin-bottom: 60px;">
+                    <h1 style="font-size: 48px; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 12px;">{{ if .CurrentFolderName }}{{ .CurrentFolderName }}{{ else }}Nexus Space{{ end }}</h1>
+                    <p style="font-size: 18px; color: var(--text-dim); font-weight: 500;">Orchestrating your digital intelligence.</p>
+                </div>
+                
+                <div class="drive-grid fade-in-up" style="animation-delay: 0.1s;">
                     {{ range .Items }}
-                    <div class="elite-card" onclick="window.location.href='{{ if eq .Type "folder" }}/?folder_id={{ .ID }}{{ else if eq .Type "document" }}/documents/view?id={{ .ID }}{{ else }}/files/download?file_id={{ .ID }}{{ end }}'">
-                        <div style="font-size: 40px; margin-bottom: 24px; color: var(--primary);">
-                            <i data-lucide="{{ if eq .Type "folder" }}folder{{ else if eq .Type "document" }}file-text{{ else }}paperclip{{ end }}"></i>
+                    <div class="elite-card glass-panel" onclick="window.location.href='{{ if eq .Type "folder" }}/?folder_id={{ .ID }}{{ else if eq .Type "document" }}/documents/view?id={{ .ID }}{{ else }}/files/download?file_id={{ .ID }}{{ end }}'">
+                        <div class="card-icon">
+                            <i data-lucide="{{ if eq .Type "folder" }}folder-kanban{{ else if eq .Type "document" }}file-text{{ else }}paperclip{{ end }}" size="28"></i>
                         </div>
-                        <div style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">{{ .Name }}</div>
-                        <div style="font-size: 13px; color: var(--text-muted);">Updated · {{ .UpdatedAt }}</div>
+                        <div class="card-title">{{ .Name }}</div>
+                        <div class="card-meta">Updated · {{ .UpdatedAt }}</div>
+                    </div>
+                    {{ end }}
+                    {{ range .Documents }}
+                    <div class="elite-card glass-panel" onclick="window.location.href='/documents/view?id={{ .ID }}'">
+                        <div class="card-icon">
+                            <i data-lucide="file-text" size="28"></i>
+                        </div>
+                        <div class="card-title">{{ .Title }}</div>
+                        <div class="card-meta">Updated · {{ .UpdatedAt }}</div>
                     </div>
                     {{ end }}
                 </div>
             {{ else if or (eq .View "document_view") (eq .View "revision_view") }}
-                <div class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div class="viewer-header fade-in-up" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px;">
                     <div>
-                        <h1 class="view-title">{{ if eq .View "revision_view" }}Revision Archive{{ else }}{{ .Document.Title }}{{ end }}</h1>
-                        <p class="view-subtitle">{{ if eq .View "revision_view" }}Historical state of {{ .Title }}{{ else }}Knowledge Object #{{ .Document.ID }}{{ end }}</p>
+                        <h1 class="view-title" style="font-size: 56px; font-weight: 800; letter-spacing: -0.04em;">{{ if eq .View "revision_view" }}Revision History{{ else }}{{ .Document.Title }}{{ end }}</h1>
+                        <p style="font-size: 18px; color: var(--text-dim); font-weight: 500;">Knowledge State · {{ .Document.UpdatedAt.Format "Jan 02, 2026" }}</p>
                     </div>
                     {{ if eq .View "document_view" }}
                     <div style="display: flex; gap: 16px;">
-                        <a href="/revisions?doc_id={{ .Document.ID }}" class="nav-item" style="padding: 12px 24px;"><i data-lucide="history"></i> Timeline</a>
-                        <a href="/documents/edit?id={{ .Document.ID }}" class="btn-elite" style="padding: 12px 24px;">Edit Object</a>
+                        <a href="/revisions?doc_id={{ .Document.ID }}" class="btn-premium btn-secondary"><i data-lucide="history" size="18"></i> Timeline</a>
+                        <a href="/documents/edit?id={{ .Document.ID }}" class="btn-premium"><i data-lucide="edit-3" size="18"></i> Edit Intelligence</a>
                     </div>
                     {{ end }}
                 </div>
-                <div class="markdown-surface">
+                <div class="doc-surface fade-in-up" style="animation-delay: 0.15s;">
+                    <div class="surface-accent" style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--primary), var(--aurora-3));"></div>
                     <article class="markdown-body">
                         {{ .Content }}
                     </article>
+                    
+                    <!-- Comments Partial Integrated -->
+                    {{ if eq .View "document_view" }}
+                    <div hx-get="/comments?doc_id={{ .Document.ID }}" hx-trigger="load" hx-swap="innerHTML" style="margin-top: 80px;">
+                         <p style="color: var(--text-dim); italic; display: flex; align-items: center; gap: 12px;"><i data-lucide="loader" class="animate-spin" size="18"></i> Retrieving discussions...</p>
+                    </div>
+                    {{ end }}
                 </div>
             {{ else if or (eq .View "document_new") (eq .View "document_edit") }}
                 <form action="/documents/{{ if eq .View "document_new" }}new{{ else }}edit?id={{ .Document.ID }}{{ end }}" method="POST">
-                    <div class="view-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <input type="text" name="title" value="{{ .Document.Title }}" class="view-title" style="background: transparent; border: none; color: white; width: 100%; outline: none;" placeholder="Object Identity..." required>
-                        <button type="submit" class="btn-elite">Initialize Object</button>
+                    <input type="hidden" name="folder_id" value="{{ .FolderID }}">
+                    <div class="editor-header fade-in-up" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 60px;">
+                        <input type="text" name="title" value="{{ .Document.Title }}" style="font-size: 56px; font-weight: 800; letter-spacing: -0.04em; background: transparent; border: none; color: white; width: 100%; outline: none;" placeholder="Intelligence Identity..." required autofocus>
+                        <button type="submit" class="btn-premium">
+                            <i data-lucide="check-circle" size="20"></i>
+                            Initialize Content
+                        </button>
                     </div>
-                    <div class="markdown-surface" style="padding: 40px;">
-                        <textarea name="content" style="width: 100%; min-height: 600px; background: transparent; border: none; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 16px; line-height: 1.8; resize: none; outline: none;" placeholder="Input neural data...">{{ .Document.Content }}</textarea>
+                    <div class="doc-surface fade-in-up" style="padding: 60px; animation-delay: 0.1s;">
+                         <textarea name="content" style="width: 100%; min-height: 700px; background: transparent; border: none; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 18px; line-height: 1.8; resize: none; outline: none; transition: 0.3s;" placeholder="Capture neural patterns here...">{{ .Document.Content }}</textarea>
                     </div>
                 </form>
             {{ else if eq .View "revisions" }}
-                 <div class="view-header">
-                    <h1 class="view-title">Timeline Archive</h1>
-                    <p class="view-subtitle">History of {{ .Title }}</p>
+                 <div class="view-intro fade-in-up" style="margin-bottom: 60px;">
+                    <h1 style="font-size: 48px; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 12px;">Temporal Archive</h1>
+                    <p style="font-size: 18px; color: var(--text-dim); font-weight: 500;">History for intelligence "{{ .Title }}".</p>
                 </div>
-                <div class="elite-grid">
+                <div class="drive-grid fade-in-up" style="animation-delay: 0.1s;">
                     {{ range .Revisions }}
-                    <div class="elite-card" onclick="window.location.href='/revisions/view?id={{ .ID }}'">
-                        <div style="font-size: 12px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 12px;">{{ .CreatedAt.Format "Jan 02, 15:04" }}</div>
-                        <div style="font-size: 18px; font-weight: 700;">Snapshot State</div>
+                    <div class="elite-card glass-panel" onclick="window.location.href='/revisions/view?id={{ .ID }}'">
+                        <div style="font-size: 12px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.1em;">Snapshot State</div>
+                        <div style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Archived Instance</div>
+                        <div style="font-size: 14px; color: var(--text-dim);">{{ .CreatedAt.Format "Jan 02, 15:04" }}</div>
                     </div>
                     {{ end }}
                 </div>
             {{ else if eq .View "search" }}
-                <div class="view-header">
-                    <h1 class="view-title">Search Retrieval</h1>
-                    <p class="view-subtitle">Found {{ len .Results }} results for "{{ .Query }}"</p>
+                <div class="view-intro fade-in-up" style="margin-bottom: 60px;">
+                    <h1 style="font-size: 48px; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 12px;">Retrieval Results</h1>
+                    <p style="font-size: 18px; color: var(--text-dim); font-weight: 500;">Nexus identified {{ len .Results }} objects for "{{ .Query }}".</p>
                 </div>
-                <div class="elite-grid">
+                <div class="drive-grid fade-in-up" style="animation-delay: 0.1s;">
                     {{ range .Results }}
-                    <div class="elite-card" onclick="window.location.href='/documents/view?id={{ .ID }}'">
-                        <div style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">{{ .Title }}</div>
-                        <div style="font-size: 14px; color: var(--text-muted); height: 4.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">{{ .Content }}</div>
+                    <div class="elite-card glass-panel" onclick="window.location.href='/documents/view?id={{ .ID }}'">
+                        <div class="card-icon" style="margin-bottom: 20px;"><i data-lucide="file-search" size="24"></i></div>
+                        <div class="card-title">{{ .Title }}</div>
+                        <div style="font-size: 14px; color: var(--text-dim); height: 4.2em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-height: 1.4;">{{ .Content }}</div>
                     </div>
                     {{ end }}
                 </div>
@@ -162,33 +209,37 @@
 </html>
 
 {{ define "comments" }}
-<div class="comments-section" style="margin-top: 64px; border-top: 1px solid var(--border); padding-top: 48px;">
-    <h3 style="font-size: 24px; font-weight: 800; margin-bottom: 32px;">Intelligence Discussion ({{ len .Comments }})</h3>
+<div class="comments-vortex" style="margin-top: 100px; padding-top: 60px; border-top: 1px solid var(--glass-border);">
+    <h3 style="font-size: 28px; font-weight: 800; margin-bottom: 40px; letter-spacing: -0.03em;">Intelligence Discussions ({{ len .Comments }})</h3>
     
-    <form hx-post="/comments/add" hx-target="closest .comments-section" hx-swap="outerHTML" style="margin-bottom: 48px; display: flex; flex-direction: column; gap: 16px;">
+    <form hx-post="/comments/add" hx-target="closest div" hx-swap="outerHTML" style="margin-bottom: 60px; display: flex; flex-direction: column; gap: 20px;">
         <input type="hidden" name="document_id" value="{{ .DocumentID }}">
-        <textarea name="content" class="btn-elite" style="background: var(--surface); border: 1px solid var(--border); width: 100%; text-align: left; padding: 24px; font-weight: 400; min-height: 120px; resize: none;" placeholder="Input neural thought..." required></textarea>
+        <div style="position: relative;">
+             <textarea name="content" class="glass-panel" style="width: 100%; min-height: 140px; padding: 24px; border-radius: 20px; font-family: inherit; font-size: 16px; color: white; resize: none; outline: none; border-color: var(--glass-border); background: rgba(255,255,255,0.03);" placeholder="Contribute to the intelligence pool..." required></textarea>
+        </div>
         <div style="display: flex; justify-content: flex-end;">
-            <button type="submit" class="btn-elite" style="padding: 12px 32px;">Post thought</button>
+            <button type="submit" class="btn-premium" style="height: 48px; border-radius: 14px;">
+                <i data-lucide="send" size="18"></i>
+                Post Intelligence
+            </button>
         </div>
     </form>
 
-    <div style="display: flex; flex-direction: column; gap: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 20px;">
         {{ range .Comments }}
-        <div class="elite-card" style="padding: 32px;">
+        <div class="comment-capsule glass-panel" style="padding: 32px; border-radius: 24px; background: rgba(255,255,255,0.02);">
              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                 <div style="display: flex; align-items: center; gap: 12px;">
-                     <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: white;">
+                 <div style="display: flex; align-items: center; gap: 14px;">
+                     <div style="width: 36px; height: 36px; border-radius: 10px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: white;">
                          {{ slice .Username 0 1 }}
                      </div>
-                     <div style="font-weight: 700; font-size: 14px;">{{ .Username }}</div>
+                     <div style="font-weight: 700; font-size: 15px;">{{ .Username }}</div>
                  </div>
-                 <div style="font-size: 11px; color: var(--text-muted); font-weight: 800; text-transform: uppercase;">{{ .CreatedAt.Format "Jan 02, 15:04" }}</div>
+                 <div style="font-size: 11px; color: var(--text-dim); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;">{{ .CreatedAt.Format "Jan 02, 15:04" }}</div>
              </div>
-             <p style="font-size: 15px; color: var(--text-muted); line-height: 1.6;">{{ .Content }}</p>
+             <p style="font-size: 16px; color: var(--text-muted); line-height: 1.6;">{{ .Content }}</p>
         </div>
         {{ end }}
     </div>
 </div>
 {{ end }}
-
