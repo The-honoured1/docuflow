@@ -21,8 +21,8 @@
             <li class="p-6 hover:bg-slate-50/50 transition-colors">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-5">
-                        <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center font-bold">
-                            {{ slice .CreatedAt.Format "Jan" 0 1 | upper }}
+                        <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center font-bold uppercase">
+                            {{ slice .CreatedAt.Format "Jan" 0 1 }}
                         </div>
                         <div>
                             <h4 class="text-lg font-bold text-slate-800">{{ .CreatedAt.Format "January 02, 2006" }}</h4>
