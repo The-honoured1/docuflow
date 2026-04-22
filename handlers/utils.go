@@ -24,6 +24,7 @@ type PageData struct {
 	IsProtected       bool
 	FolderID          string
 	Revisions         any
+	RevisionsList     []models.Revision
 	Results           any
 	Title             string
 	ShowGate          bool

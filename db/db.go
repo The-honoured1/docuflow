@@ -113,6 +113,8 @@ func InitSchema(db *sql.DB) error {
 	db.Exec(`ALTER TABLE documents ADD COLUMN share_token TEXT`)
 	db.Exec(`ALTER TABLE documents ADD COLUMN share_password TEXT`)
 	db.Exec(`ALTER TABLE documents ADD COLUMN folder_id INTEGER`)
+	db.Exec(`ALTER TABLE documents ADD COLUMN version_count INTEGER DEFAULT 1`)
 	db.Exec(`ALTER TABLE document_files ADD COLUMN folder_id INTEGER`)
 	return nil
 }
+

@@ -88,12 +88,39 @@
                         <input type="text" name="q" class="search-field" style="padding-left: 40px;" value="{{ .Query }}" placeholder="Search Nexus...">
                     </div>
                 </form>
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn-solid btn-secondary" style="width: 38px; padding: 0; justify-content: center;"><i data-lucide="bell" size="18"></i></button>
-                    <a href="/documents/new{{ if .CurrentFolderID }}?folder_id={{ .CurrentFolderID }}{{ end }}" class="btn-solid">
-                        <i data-lucide="plus" size="18"></i> Add Object
-                    </a>
+                <div class="dropdown" id="new-menu">
+                    <button class="btn-solid" onclick="document.getElementById('new-menu').classList.toggle('active')">
+                        <i data-lucide="plus" size="18"></i> Add Intelligence
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="/documents/new{{ if .CurrentFolderID }}?folder_id={{ .CurrentFolderID }}{{ end }}" class="dropdown-item">
+                            <i data-lucide="file-plus" size="16"></i> New Document
+                        </a>
+                        <form action="/folders/create" method="POST" id="new-folder-form">
+                            <input type="hidden" name="parent_id" value="{{ .CurrentFolderID }}">
+                            <input type="hidden" name="name" id="new-folder-name" value="Untitled Folder">
+                            <button type="button" onclick="promptFolderName()" class="dropdown-item">
+                                <i data-lucide="folder-plus" size="16"></i> New Folder
+                            </button>
+                        </form>
+                        <div class="dropdown-divider"></div>
+                        <form action="/files/upload" method="POST" enctype="multipart/form-data" id="file-upload-form">
+                            <input type="hidden" name="folder_id" value="{{ .CurrentFolderID }}">
+                            <input type="file" name="file" id="file-input" style="display: none;" multiple onchange="document.getElementById('file-upload-form').submit()">
+                            <button type="button" onclick="document.getElementById('file-input').click()" class="dropdown-item">
+                                <i data-lucide="upload" size="16"></i> Upload Files
+                            </button>
+                        </form>
+                        <form action="/files/upload" method="POST" enctype="multipart/form-data" id="folder-upload-form">
+                            <input type="hidden" name="folder_id" value="{{ .CurrentFolderID }}">
+                            <input type="file" name="file" id="folder-input" style="display: none;" webkitdirectory directory onchange="document.getElementById('folder-upload-form').submit()">
+                            <button type="button" onclick="document.getElementById('folder-input').click()" class="dropdown-item">
+                                <i data-lucide="folder-up" size="16"></i> Upload Folder
+                            </button>
+                        </form>
+                    </div>
                 </div>
+
             </header>
 
             <div class="view-viewport">
@@ -103,24 +130,7 @@
                         <p style="color: var(--text-dim); font-weight: 600;">Managing solid-state intelligence objects.</p>
                     </div>
 
-                    <div class="dashboard-actions">
-                        <div class="solid-panel" style="padding: 24px;">
-                            <div class="solid-panel-title" style="margin-bottom: 16px;"><i data-lucide="plus-square" size="18"></i> New Neural Folder</div>
-                            <form action="/folders/create" method="POST" style="display: flex; gap: 12px;">
-                                <input type="hidden" name="parent_id" value="{{ .CurrentFolderID }}">
-                                <input type="text" name="name" class="search-field" style="flex: 1;" placeholder="Folder identity..." required>
-                                <button type="submit" class="btn-solid">Initialize</button>
-                            </form>
-                        </div>
-                        <div class="solid-panel" style="padding: 24px;">
-                            <div class="solid-panel-title" style="margin-bottom: 16px;"><i data-lucide="upload-cloud" size="18"></i> Direct Neural Upload</div>
-                            <form action="/files/upload" method="POST" enctype="multipart/form-data" style="display: flex; gap: 12px;">
-                                <input type="hidden" name="folder_id" value="{{ .CurrentFolderID }}">
-                                <input type="file" name="file" class="search-field" style="flex: 1; padding-top: 8px;" required>
-                                <button type="submit" class="btn-solid">Upload</button>
-                            </form>
-                        </div>
-                    </div>
+
 
                     <div class="solid-grid">
                         {{ range .Items }}
@@ -166,19 +176,46 @@
                         {{ end }}
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 320px; gap: 40px; align-items: start;">
-                        <div class="surface-mask" style="margin: 0; max-width: none;">
-                            <article class="markdown-body">
-                                {{ .Content }}
-                            </article>
-
+                    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start;">
+                        <article class="editor-container">
+                            <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+                                <div style="font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em;">Direct Neural State</div>
+                                <div id="autosave-status" style="font-size: 11px; font-weight: 700; color: var(--text-dim);">All states committed</div>
+                            </div>
+                            <textarea 
+                                name="content" 
+                                class="editor-textarea" 
+                                placeholder="Begin inputting intelligence..."
+                                hx-post="/documents/autosave"
+                                hx-trigger="keyup changed delay:1s"
+                                hx-vals='js:{id: "{{ .Document.ID }}"}'
+                                hx-target="#autosave-status"
+                            >{{ .Document.Content }}</textarea>
+                            
                             {{ if eq .View "document_view" }}
                             <div hx-get="/comments?doc_id={{ .Document.ID }}" hx-trigger="load" hx-swap="innerHTML" style="margin-top: 80px;"></div>
                             {{ end }}
-                        </div>
+                        </article>
 
-                        {{ if eq .View "document_view" }}
+
                         <aside class="functional-nexus">
+                            <!-- Version Snapshots -->
+                            <div class="solid-panel">
+                                <div class="solid-panel-title"><i data-lucide="history" size="18"></i> Snapshot History</div>
+                                <div class="snapshot-list">
+                                    <a href="/documents/view?id={{ .Document.ID }}" class="snapshot-item" style="border-color: var(--primary); background: var(--primary-soft);">
+                                        <div class="snapshot-meta">Current State</div>
+                                        <div class="snapshot-time">Active Instance</div>
+                                    </a>
+                                    {{ range .RevisionsList }}
+                                    <a href="/revisions/view?id={{ .ID }}" class="snapshot-item">
+                                        <div class="snapshot-meta">Snapshot {{ .ID }}</div>
+                                        <div class="snapshot-time">{{ .CreatedAt.Format "Jan 02, 15:04" }}</div>
+                                    </a>
+                                    {{ end }}
+                                </div>
+                            </div>
+
                             <!-- Sharing Panel -->
                             <div class="solid-panel">
                                 <div class="solid-panel-title"><i data-lucide="share-2" size="18"></i> Security & Sharing</div>
@@ -252,16 +289,18 @@
                         {{ end }}
                     </div>
                 {{ else if or (eq .View "document_new") (eq .View "document_edit") }}
+                    <!-- Redirected to unified view if needed, but keeping for direct access -->
                     <form action="/documents/{{ if eq .View "document_new" }}new{{ else }}edit?id={{ .Document.ID }}{{ end }}" method="POST">
                         <input type="hidden" name="folder_id" value="{{ .FolderID }}">
                         <div class="view-header" style="display: flex; justify-content: space-between; align-items: center;">
                             <input type="text" name="title" value="{{ .Document.Title }}" class="view-title" style="background: transparent; border: none; color: white; width: 100%; outline: none;" placeholder="Object Identity..." required autofocus>
-                            <button type="submit" class="btn-solid">Commit State</button>
+                            <button type="submit" class="btn-solid">Commit Snapshot</button>
                         </div>
-                        <div class="surface-mask">
-                            <textarea name="content" style="width: 100%; min-height: 800px; background: transparent; border: none; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 16px; line-height: 1.8; resize: none; outline: none;" placeholder="Input neural patterns...">{{ .Document.Content }}</textarea>
+                        <div class="editor-container">
+                            <textarea name="content" class="editor-textarea" placeholder="Input neural patterns...">{{ .Document.Content }}</textarea>
                         </div>
                     </form>
+
                 {{ else if eq .View "revisions" }}
                     <div class="view-header">
                         <h1 class="view-title">Audit Log</h1>
@@ -302,7 +341,23 @@
 
     <script>
         lucide.createIcons();
+
+        function promptFolderName() {
+            const name = prompt("Enter folder identity:", "New Neural Folder");
+            if (name) {
+                document.getElementById('new-folder-name').value = name;
+                document.getElementById('new-folder-form').submit();
+            }
+        }
+
+        // Close dropdowns on outside click
+        window.onclick = function(event) {
+            if (!event.target.matches('.btn-solid') && !event.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            }
+        }
     </script>
+
 </body>
 </html>
 

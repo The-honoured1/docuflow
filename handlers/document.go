@@ -9,11 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gomarkdown/markdown"
-	"github.com/gomarkdown/markdown/parser"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
+
 
 var folderIDPtr *int
 
@@ -112,30 +111,30 @@ func (h *DocumentHandler) ViewDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Render Markdown
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
-	p := parser.NewWithExtensions(extensions)
-	htmlBytes := markdown.ToHTML([]byte(doc.Content), p, nil)
-
-	// Load attached files
-	files, _ := GetDocumentFiles(h.DB, id)
-
-	shareURL := ""
-	if doc.ShareToken != "" {
-		shareURL = fmt.Sprintf("http://%s/share/%s", r.Host, doc.ShareToken)
+	// Load Snapshots
+	rows, _ := h.DB.Query(`SELECT id, created_at FROM revisions WHERE document_id = ? ORDER BY created_at DESC LIMIT 10`, id)
+	var revisions []models.Revision
+	if rows != nil {
+		defer rows.Close()
+		for rows.Next() {
+			var r models.Revision
+			rows.Scan(&r.ID, &r.CreatedAt)
+			revisions = append(revisions, r)
+		}
 	}
 
 	data := GetBaseData(r)
 	data.Document = doc
-	data.Content = template.HTML(htmlBytes)
 	data.Files = files
 	data.ShareURL = shareURL
 	data.IsProtected = doc.SharePassword != ""
 	data.View = "document_view"
+	data.RevisionsList = revisions
 
 	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 	tmpl.Execute(w, data)
 }
+
 
 
 func (h *DocumentHandler) EditDocument(w http.ResponseWriter, r *http.Request) {
@@ -187,15 +186,20 @@ func (h *DocumentHandler) Autosave(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	content := r.FormValue("content")
 
-	_, err := h.DB.Exec("UPDATE documents SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", content, id)
-	if err != nil {
-		http.Error(w, "Save failed", http.StatusInternalServerError)
-		return
+	// Automatic Versioning: Create a revision if the last one was over 5 minutes ago
+	var lastID int
+	var lastCreatedAt time.Time
+	err = h.DB.QueryRow("SELECT id, created_at FROM revisions WHERE document_id = ? ORDER BY created_at DESC LIMIT 1", id).Scan(&lastID, &lastCreatedAt)
+	
+	if err == sql.ErrNoRows || time.Since(lastCreatedAt) > 5*time.Minute {
+		h.DB.Exec("INSERT INTO revisions (document_id, content, editor_id, change_summary) VALUES (?, ?, ?, ?)",
+			id, content, 1, "Auto-snapshot")
 	}
 
 	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(`<span style="color: #22c55e;">Saved</span>`))
+	w.Write([]byte(`<span style="color: var(--primary);">Snapshot Synchronized</span>`))
 }
+
 
 // SetPassword sets or clears the share password for a document.
 func (h *DocumentHandler) SetPassword(w http.ResponseWriter, r *http.Request) {
@@ -305,22 +309,17 @@ func (h *DocumentHandler) ShareView(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Render document content
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
-	p := parser.NewWithExtensions(extensions)
-	htmlBytes := markdown.ToHTML([]byte(doc.Content), p, nil)
-
 	files, _ := GetDocumentFiles(h.DB, fmt.Sprintf("%d", doc.ID))
 
 	data := GetBaseData(r)
 	data.Title = doc.Title
 	data.ShowGate = false
 	data.Document = doc
-	data.Content = template.HTML(htmlBytes)
 	data.Files = files
 	data.Token = token
 
 	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 	tmpl.Execute(w, data)
 }
+
 

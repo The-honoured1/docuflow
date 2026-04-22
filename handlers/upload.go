@@ -39,79 +39,62 @@ func (h *UploadHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, header, err := r.FormFile("file")
-	if err != nil {
-		http.Error(w, "No file provided", http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
-
-	// Sanitize filename
-	originalName := filepath.Base(header.Filename)
-	ext := filepath.Ext(originalName)
-	safeBase := sanitizeFilename(strings.TrimSuffix(originalName, ext))
-	timestamp := strconv.FormatInt(time.Now().UnixMilli(), 10)
-	safeName := fmt.Sprintf("%s_%s%s", safeBase, timestamp, ext)
-
-	// Create upload directory
-	// Use folder_id if docID is empty
-	dirName := docID
-	if dirName == "" {
-		dirName = "standalone"
-		if folderID != "" {
-			dirName = "folder_" + folderID
+	files := r.MultipartForm.File["file"]
+	for _, header := range files {
+		file, err := header.Open()
+		if err != nil {
+			continue
 		}
-	}
+		defer file.Close()
 
-	uploadDir := filepath.Join("uploads", dirName)
-	if err := os.MkdirAll(uploadDir, 0755); err != nil {
-		http.Error(w, "Server error creating upload directory", http.StatusInternalServerError)
-		return
-	}
+		// Sanitize filename
+		originalName := filepath.Base(header.Filename)
+		ext := filepath.Ext(originalName)
+		safeBase := sanitizeFilename(strings.TrimSuffix(originalName, ext))
+		timestamp := strconv.FormatInt(time.Now().UnixMilli(), 10)
+		safeName := fmt.Sprintf("%s_%s%s", safeBase, timestamp, ext)
 
-	destPath := filepath.Join(uploadDir, safeName)
-	dst, err := os.Create(destPath)
-	if err != nil {
-		http.Error(w, "Server error saving file", http.StatusInternalServerError)
-		return
-	}
-	defer dst.Close()
+		dirName := docID
+		if dirName == "" {
+			dirName = "standalone"
+			if folderID != "" {
+				dirName = "folder_" + folderID
+			}
+		}
 
-	written, err := io.Copy(dst, file)
-	if err != nil {
-		os.Remove(destPath)
-		http.Error(w, "Server error writing file", http.StatusInternalServerError)
-		return
-	}
+		uploadDir := filepath.Join("uploads", dirName)
+		os.MkdirAll(uploadDir, 0755)
 
-	mimeType := header.Header.Get("Content-Type")
-	if mimeType == "" {
-		mimeType = "application/octet-stream"
-	}
+		destPath := filepath.Join(uploadDir, safeName)
+		dst, err := os.Create(destPath)
+		if err != nil {
+			continue
+		}
+		
+		written, _ := io.Copy(dst, file)
+		dst.Close()
 
-	if docID != "" {
-		res, err = h.DB.Exec(
-			`INSERT INTO document_files (document_id, file_name, file_path, mime_type, file_size) VALUES (?, ?, ?, ?, ?)`,
-			docID, originalName, destPath, mimeType, written,
-		)
-	} else {
-		if folderID == "" {
-			res, err = h.DB.Exec(
-				`INSERT INTO document_files (file_name, file_path, mime_type, file_size) VALUES (?, ?, ?, ?)`,
-				originalName, destPath, mimeType, written,
+		mimeType := header.Header.Get("Content-Type")
+		if mimeType == "" {
+			mimeType = "application/octet-stream"
+		}
+
+		if docID != "" {
+			h.DB.Exec(
+				`INSERT INTO document_files (document_id, file_name, file_path, mime_type, file_size) VALUES (?, ?, ?, ?, ?)`,
+				docID, originalName, destPath, mimeType, written,
 			)
-		} else {
-			res, err = h.DB.Exec(
+		} else if folderID != "" {
+			h.DB.Exec(
 				`INSERT INTO document_files (folder_id, file_name, file_path, mime_type, file_size) VALUES (?, ?, ?, ?, ?)`,
 				folderID, originalName, destPath, mimeType, written,
 			)
+		} else {
+			h.DB.Exec(
+				`INSERT INTO document_files (file_name, file_path, mime_type, file_size) VALUES (?, ?, ?, ?)`,
+				originalName, destPath, mimeType, written,
+			)
 		}
-	}
-
-	if err != nil {
-		os.Remove(destPath)
-		http.Error(w, "Failed to record file in database", http.StatusInternalServerError)
-		return
 	}
 
 	// Redirect
@@ -125,6 +108,7 @@ func (h *UploadHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, dest, http.StatusSeeOther)
 	}
 }
+
 
 // DeleteFile removes an uploaded file from disk and the database.
 func (h *UploadHandler) DeleteFile(w http.ResponseWriter, r *http.Request) {

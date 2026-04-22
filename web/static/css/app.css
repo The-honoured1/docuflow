@@ -383,3 +383,122 @@ body {
 .view-entry {
     animation: none;
 }
+/* Dropdown Menu */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    min-width: 200px;
+    display: none;
+    z-index: 200;
+    padding: 8px;
+}
+
+.dropdown.active .dropdown-menu {
+    display: block;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: var(--radius);
+    transition: var(--trans);
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    background: transparent;
+    text-align: left;
+}
+
+.dropdown-item:hover {
+    background: var(--surface-active);
+    color: var(--text);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0;
+}
+
+/* Functional Snapshot Sidebar */
+.functional-nexus {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.snapshot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.snapshot-item {
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: var(--trans);
+}
+
+.snapshot-item:hover {
+    background: var(--surface-active);
+    border-color: var(--primary);
+}
+
+.snapshot-meta {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 4px;
+}
+
+.snapshot-time {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+/* Unified Editor */
+.editor-container {
+    width: 100%;
+    min-height: 80vh;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.editor-textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    line-height: 1.8;
+    resize: none;
+    outline: none;
+    width: 100%;
+}
