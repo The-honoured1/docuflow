@@ -15,6 +15,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var folderIDPtr *int
+
 type DocumentHandler struct {
 	DB *sql.DB
 }
@@ -61,8 +63,7 @@ func (h *DocumentHandler) NewDocument(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
 		tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/document_edit.html"))
-		
-		var folderIDPtr *int
+
 		if folderID != "" {
 			// Basic validation/parsing could go here
 		}
@@ -278,10 +279,10 @@ func (h *DocumentHandler) ShareView(w http.ResponseWriter, r *http.Request) {
 				// Wrong password — re-show gate with error
 				tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/share_view.html"))
 				tmpl.Execute(w, struct {
-					Title       string
-					ShowGate    bool
-					GateError   string
-					Token       string
+					Title     string
+					ShowGate  bool
+					GateError string
+					Token     string
 				}{
 					Title:     doc.Title,
 					ShowGate:  true,

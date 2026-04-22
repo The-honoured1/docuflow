@@ -16,6 +16,8 @@ type UploadHandler struct {
 	DB *sql.DB
 }
 
+var res sql.Result
+
 // UploadFile handles multipart file uploads attached to a document or a folder.
 func (h *UploadHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -87,7 +89,6 @@ func (h *UploadHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		mimeType = "application/octet-stream"
 	}
 
-	var res sql.Result
 	if docID != "" {
 		res, err = h.DB.Exec(
 			`INSERT INTO document_files (document_id, file_name, file_path, mime_type, file_size) VALUES (?, ?, ?, ?, ?)`,
