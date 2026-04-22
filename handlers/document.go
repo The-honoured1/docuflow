@@ -123,6 +123,12 @@ func (h *DocumentHandler) ViewDocument(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	files, _ := GetDocumentFiles(h.DB, id)
+	shareURL := ""
+	if doc.ShareToken != "" {
+		shareURL = fmt.Sprintf("http://%s/share/%s", r.Host, doc.ShareToken)
+	}
+
 	data := GetBaseData(r)
 	data.Document = doc
 	data.Files = files
@@ -189,7 +195,7 @@ func (h *DocumentHandler) Autosave(w http.ResponseWriter, r *http.Request) {
 	// Automatic Versioning: Create a revision if the last one was over 5 minutes ago
 	var lastID int
 	var lastCreatedAt time.Time
-	err = h.DB.QueryRow("SELECT id, created_at FROM revisions WHERE document_id = ? ORDER BY created_at DESC LIMIT 1", id).Scan(&lastID, &lastCreatedAt)
+	err := h.DB.QueryRow("SELECT id, created_at FROM revisions WHERE document_id = ? ORDER BY created_at DESC LIMIT 1", id).Scan(&lastID, &lastCreatedAt)
 	
 	if err == sql.ErrNoRows || time.Since(lastCreatedAt) > 5*time.Minute {
 		h.DB.Exec("INSERT INTO revisions (document_id, content, editor_id, change_summary) VALUES (?, ?, ?, ?)",
