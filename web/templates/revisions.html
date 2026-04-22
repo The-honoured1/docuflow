@@ -1,64 +1,52 @@
 {{ define "content" }}
-<div class="max-w-4xl mx-auto py-10">
-    <div class="flex justify-between items-end mb-10 pb-8 border-b border-slate-100">
+<div class="revisions-container">
+    <div class="revisions-header flex justify-between items-center mb-12">
         <div>
-            <h1 class="text-3xl font-bold text-slate-900 mb-2">Version History</h1>
-            <p class="text-slate-500 flex items-center gap-2">
-                <i data-lucide="file-text" size="16"></i>
-                {{ .Title }}
-            </p>
+            <div class="flex items-center gap-4 mb-4">
+                <a href="/documents/view?id={{ .DocumentID }}" class="btn btn-secondary btn-sm p-3">
+                    <i data-lucide="arrow-left" size="18"></i>
+                </a>
+                <h1 class="text-4xl font-extrabold tracking-tight">Timeline Archive</h1>
+            </div>
+            <p class="text-dim font-medium">Historical states for <span class="text-main">"{{ .DocumentTitle }}"</span></p>
         </div>
-        <a href="/documents/view?id={{ .DocumentID }}" class="btn btn-secondary h-11">
-            <i data-lucide="arrow-left" size="18"></i>
-            Back to Document
-        </a>
+        <div class="badge px-4 py-2" style="background: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.1); border: 1px solid var(--border); color: var(--primary);">
+            {{ len .Revisions }} Snapshots
+        </div>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
-        {{ if .Revisions }}
-        <ul class="divide-y divide-slate-50">
-            {{ range .Revisions }}
-            <li class="p-6 hover:bg-slate-50/50 transition-colors">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-5">
-                        <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center font-bold uppercase">
-                            {{ slice .CreatedAt.Format "Jan" 0 1 }}
+    <div class="revisions-timeline relative pl-12 border-l-2 border-border ml-6 flex flex-col gap-10">
+        {{ range .Revisions }}
+        <div class="timeline-item relative group">
+            <div class="timeline-dot absolute -left-[57px] top-4 w-4 h-4 bg-slate-900 border-2 border-primary rounded-full group-hover:bg-primary transition-colors shadow-glow"></div>
+            
+            <a href="/revisions/view?id={{ .ID }}" class="revision-card block glass-card p-6 rounded-2xl border border-border hover:border-primary hover:shadow-glow transition-all">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-6">
+                        <div class="w-14 h-14 bg-slate-950 rounded-xl flex items-center justify-center text-dim group-hover:text-primary transition-colors">
+                            <i data-lucide="clock-rewind" size="24"></i>
                         </div>
                         <div>
-                            <h4 class="text-lg font-bold text-slate-800">{{ .CreatedAt.Format "January 02, 2006" }}</h4>
-                            <p class="text-sm text-slate-400 flex items-center gap-2">
-                                <i data-lucide="clock" size="14"></i>
-                                {{ .CreatedAt.Format "15:04" }} • {{ if .ChangeSummary }}{{ .ChangeSummary }}{{ else }}Manual Save{{ end }}
-                            </p>
+                            <div class="text-sm font-black text-primary uppercase tracking-widest mb-1">{{ .CreatedAt.Format "Jan 02, 2006 · 15:04" }}</div>
+                            <h3 class="text-xl font-bold text-main">Version Snapshot</h3>
                         </div>
                     </div>
-                    <div class="flex gap-3">
-                        <a href="/revisions/view?id={{ .ID }}" class="btn btn-ghost h-10 px-4 text-sm gap-2">
-                            <i data-lucide="eye" size="16"></i>
-                            View
-                        </a>
-                        <form action="/revisions/rollback" method="POST" class="m-0">
-                            <input type="hidden" name="revision_id" value="{{ .ID }}">
-                            <button type="submit" class="btn bg-amber-50 text-amber-600 hover:bg-amber-100 h-10 px-4 text-sm gap-2 rounded-xl transition-all font-bold">
-                                <i data-lucide="rotate-ccw" size="16"></i>
-                                Restore
-                            </button>
-                        </form>
+                    <div class="btn btn-ghost group-hover:bg-primary group-hover:text-white transition-all">
+                        Inspect <i data-lucide="eye" size="16"></i>
                     </div>
                 </div>
-            </li>
-            {{ end }}
-        </ul>
-        {{ else }}
-        <div class="p-20 text-center">
-            <div class="w-20 h-20 bg-slate-100 rounded-3xl flex items-center justify-center text-slate-300 mx-auto mb-6">
-                <i data-lucide="history" size="40"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-slate-800 mb-2">Pristine State</h3>
-            <p class="text-slate-400 max-w-xs mx-auto">No previous versions have been archived yet. Changes will appear here automatically.</p>
+            </a>
         </div>
         {{ end }}
     </div>
+
+    {{ if not .Revisions }}
+    <div class="empty-state text-center py-20">
+        <div class="text-dim opacity-20 mb-8"><i data-lucide="timer-off" size="80"></i></div>
+        <h2 class="text-2xl font-bold mb-3">No History Found</h2>
+        <p class="text-dim">This document is in its ultimate state. No previous revisions exist.</p>
+    </div>
+    {{ end }}
 </div>
 
 <script>

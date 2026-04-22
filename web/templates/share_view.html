@@ -1,103 +1,91 @@
 {{ define "content" }}
-{{ if .ShowGate }}
-<!-- Password Gate (Premium Refinement) -->
-<div class="auth-container max-w-md mx-auto py-20 animate-fade-in">
-    <div class="auth-card bg-white p-12 rounded-3xl shadow-2xl border border-slate-100 text-center">
-        <div class="mb-10 text-center">
-            <div class="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-lg shadow-amber-200">
-                <i data-lucide="lock" size="28"></i>
-            </div>
-            <h1 class="text-3xl font-bold text-slate-900 mb-2">Secure Document</h1>
-            <p class="text-slate-400">Unlock "{{ .Title }}" to proceed.</p>
-        </div>
-
-        {{ if .GateError }}
-        <div class="flex items-center gap-3 p-4 mb-6 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-semibold text-left">
-            <i data-lucide="alert-circle" size="18"></i>
-            {{ .GateError }}
-        </div>
-        {{ end }}
-
-        <form method="POST" action="/share/{{ .Token }}" class="text-left">
-            <div class="form-group mb-8">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2" for="share_password">Access Token / Password</label>
-                <input
-                    id="share_password"
-                    type="password"
-                    name="share_password"
-                    class="form-input w-full h-12 bg-slate-50 border-slate-200 rounded-xl px-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all"
-                    placeholder="Enter the passcode..."
-                    autofocus
-                    required>
-            </div>
-            <button type="submit" class="btn btn-primary w-full h-14 rounded-xl text-lg font-bold shadow-xl">
-                Unlock Access
-                <i data-lucide="chevron-right" size="18"></i>
-            </button>
-        </form>
-    </div>
-</div>
-{{ else }}
-<!-- Public Document View (Premium Refinement) -->
-<div class="max-w-5xl mx-auto py-8">
-    <div class="bg-indigo-600 rounded-2xl p-6 mb-12 shadow-xl shadow-indigo-100 border border-indigo-500/20 text-white flex items-center gap-6 overflow-hidden relative">
-        <div class="absolute -right-10 -bottom-10 opacity-10 rotate-12">
-            <i data-lucide="file-check" size="200"></i>
-        </div>
-        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-md shrink-0">
-            <i data-lucide="share-2" size="24"></i>
-        </div>
-        <div class="flex-1">
-            <h3 class="text-lg font-bold">Public Knowledge Asset</h3>
-            <p class="text-indigo-100 text-sm opacity-90">Viewing a verified shared document via the DocuFlow cloud network.</p>
-        </div>
-        <a href="/register" class="btn bg-white text-indigo-600 hover:bg-slate-50 transition-colors h-11 px-6 rounded-xl font-bold shadow-lg shadow-indigo-700/20">
-            Join DocuFlow
-        </a>
+<div class="share-view-wrapper fixed inset-0 flex flex-col bg-slate-950 overflow-y-auto">
+    <!-- Premium Backdrop -->
+    <div class="glass-bg absolute inset-0 -z-10">
+        <div class="glow-1 absolute top-0 left-1/4 w-[60%] h-1/2 bg-primary/10 blur-[150px]"></div>
+        <div class="glow-2 absolute bottom-0 right-1/4 w-[60%] h-1/2 bg-accent-magenta/10 blur-[150px]"></div>
     </div>
 
-    <div class="doc-surface bg-white p-16 rounded-3xl shadow-xl border border-slate-100 relative mb-12">
-        <div class="mb-10 pb-10 border-b border-slate-50">
-            <h1 class="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">{{ .Document.Title }}</h1>
-            <div class="flex items-center gap-2 text-slate-400 text-sm font-medium">
-                 <i data-lucide="info" size="14"></i>
-                 Finalized version • Shared via secure link
-            </div>
+    <header class="share-header h-24 border-b border-border flex items-center justify-between px-12 sticky top-0 bg-slate-950/80 backdrop-blur-xl z-50">
+        <div class="flex items-center gap-6">
+            <div class="brand-logo w-10 h-10 text-xl shadow-glow">D</div>
+            <div style="width: 1px; height: 24px; background: var(--border);"></div>
+            <h2 class="text-lg font-bold text-main tracking-tight">Shared Intelligence</h2>
         </div>
-
-        <article class="markdown-body">
-            {{ .Content }}
-        </article>
-    </div>
-
-    {{ if .Files }}
-    <div class="bg-slate-100/50 p-10 rounded-3xl border border-slate-200">
-        <div class="flex items-center gap-3 mb-8">
-            <i data-lucide="paperclip" class="text-primary" size="24"></i>
-            <h3 class="text-xl font-bold text-slate-800">Linked Assets ({{ len .Files }})</h3>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {{ range .Files }}
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 group hover:border-primary transition-all">
-                <div class="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-primary-light group-hover:text-primary transition-colors">
-                    <i data-lucide="file-archive" size="24"></i>
-                </div>
-                <div class="flex-1 truncate">
-                    <h4 class="font-bold text-slate-800 truncate">{{ .FileName }}</h4>
-                    <p class="text-xs text-slate-400">Cloud Storage Asset</p>
-                </div>
-                <a href="/files/download?file_id={{ .ID }}" class="btn btn-secondary btn-sm h-10 w-10 p-0 rounded-lg">
-                    <i data-lucide="download" size="18"></i>
-                </a>
-            </div>
+        <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-dim uppercase tracking-widest bg-surface-light px-3 py-1.5 rounded-lg border border-border">Public Access</span>
+            {{ if not .User }}
+            <a href="/login" class="btn btn-primary btn-sm px-6">Join DocuFlow</a>
             {{ end }}
         </div>
-    </div>
-    {{ end }}
+    </header>
+
+    <main class="share-content flex-1 py-20 px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="doc-meta-card mb-12 flex justify-between items-end border-b border-border pb-10">
+                <div>
+                    <h1 class="text-5xl font-black mb-4 tracking-tighter">{{ .Document.Title }}</h1>
+                    <div class="flex items-center gap-6 text-sm text-dim">
+                        <span class="flex items-center gap-2">
+                            <i data-lucide="calendar" size="14"></i>
+                            Updated {{ .Document.UpdatedAt.Format "Jan 02, 2006" }}
+                        </span>
+                        <span class="flex items-center gap-2">
+                            <i data-lucide="eye" size="14"></i>
+                            Community Access Enabled
+                        </span>
+                    </div>
+                </div>
+                <div class="badge px-4 py-2" style="background: hsla(150, 70%, 40%, 0.1); color: #10B981; border: 1px solid hsla(150, 70%, 40%, 0.2);">
+                    Read Only
+                </div>
+            </div>
+
+            <div class="doc-surface p-12 md:p-20 rounded-[40px] shadow-2xl border border-border bg-slate-900/50 backdrop-blur-sm relative overflow-hidden">
+                <div class="surface-accent absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-accent-cyan to-accent-magenta"></div>
+                <article class="markdown-body">
+                    {{ .Content }}
+                </article>
+            </div>
+            
+            <footer class="mt-20 text-center pb-20">
+                <p class="text-dim text-sm mb-6 font-medium">Capture your own knowledge with a premium workspace.</p>
+                <a href="/register" class="btn btn-secondary h-14 px-10 rounded-2xl hover:border-primary transition-all group">
+                    <span class="flex items-center gap-3">
+                        Create Your Drive
+                        <i data-lucide="chevron-right" size="18" class="group-hover:translate-x-1 transition-transform"></i>
+                    </span>
+                </a>
+            </footer>
+        </div>
+    </main>
 </div>
-{{ end }}
 
 <script>
     lucide.createIcons();
 </script>
+
+<style>
+    .share-view-wrapper {
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+    }
+    
+    .share-view-wrapper::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .share-view-wrapper::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 10px;
+    }
+
+    .doc-surface {
+        box-shadow: 0 40px 120px -20px rgba(0,0,0,0.8);
+    }
+    
+    body {
+        overflow: hidden; /* Prevent double scrollbar if embedded */
+    }
+</style>
 {{ end }}
