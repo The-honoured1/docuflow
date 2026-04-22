@@ -1,46 +1,30 @@
 {{ define "content" }}
 <div class="drive-header flex justify-between items-center mb-8">
-    <div class="breadcrumbs">
-        <a href="/" class="breadcrumb-item">My Drive</a>
+    <div class="breadcrumb-nav">
+        <a href="/" class="breadcrumb-link">My Drive</a>
         {{ if .CurrentFolderID }}
-        <span class="breadcrumb-separator">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 18 15 12 9 6" />
-            </svg>
-        </span>
-        <span class="breadcrumb-item current">{{ .CurrentFolderName }}</span>
+        <i data-lucide="chevron-right" class="breadcrumb-sep" size="16"></i>
+        <span class="breadcrumb-current">{{ .CurrentFolderName }}</span>
         {{ end }}
     </div>
 
     <div class="drive-actions dropdown-container">
         <button class="btn btn-primary" id="btn-new">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            <i data-lucide="plus" size="18"></i>
             New
         </button>
         <div class="dropdown-menu" id="new-dropdown">
-            <a href="#" class="dropdown-item" onclick="document.getElementById('modal-folder').style.display='flex'">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                </svg>
+            <a href="#" class="dropdown-item" onclick="showModal('modal-folder')">
+                <i data-lucide="folder-plus" size="18"></i>
                 New Folder
             </a>
             <hr>
             <a href="/documents/new{{ if .CurrentFolderID }}?folder_id={{ .CurrentFolderID }}{{ end }}" class="dropdown-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                </svg>
+                <i data-lucide="file-plus" size="18"></i>
                 New Document
             </a>
             <a href="#" class="dropdown-item" onclick="document.getElementById('file-upload').click()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
+                <i data-lucide="upload-cloud" size="18"></i>
                 File Upload
             </a>
         </div>
@@ -55,8 +39,14 @@
 <div class="drive-grid">
     {{ range .Items }}
     <div class="item-card" {{ if eq .Type "folder" }} ondblclick="window.location.href='/?folder_id={{ .ID }}'" {{ else if eq .Type "document" }} ondblclick="window.location.href='/documents/view?id={{ .ID }}'" {{ else }} ondblclick="window.location.href='/files/download?file_id={{ .ID }}'" {{ end }}>
-        <div class="item-icon-wrapper {{ .Type }}">
-            <span class="item-icon">{{ .Icon }}</span>
+        <div class="item-icon-box">
+            {{ if eq .Type "folder" }}
+            <i data-lucide="folder" size="32" stroke-width="1.5"></i>
+            {{ else if eq .Type "document" }}
+            <i data-lucide="file-text" size="32" stroke-width="1.5"></i>
+            {{ else }}
+            <i data-lucide="file" size="32" stroke-width="1.5"></i>
+            {{ end }}
         </div>
         <div class="item-info">
             <span class="item-name" title="{{ .Name }}">{{ .Name }}</span>
@@ -71,25 +61,29 @@
     {{ end }}
 </div>
 {{ else }}
-<div class="empty-drive">
-    <div class="empty-icon">📁</div>
-    <h3>No files yet</h3>
-    <p>Upload a file or create a document to get started.</p>
+<div class="empty-state">
+    <div class="empty-icon">
+        <i data-lucide="folder-open" size="64"></i>
+    </div>
+    <h3 class="text-xl font-bold mb-2">Your drive is empty</h3>
+    <p class="text-muted mb-6">Start by creating a new document or folder.</p>
+    <button class="btn btn-secondary" onclick="showModal('modal-folder')">Create Folder</button>
 </div>
 {{ end }}
 
 <!-- New Folder Modal -->
-<div class="modal" id="modal-folder">
+<div class="modal modal-overlay" id="modal-folder" style="display: none;">
     <div class="modal-content">
         <h3>New Folder</h3>
         <form action="/folders/new" method="POST">
             <input type="hidden" name="parent_id" value="{{ .CurrentFolderID }}">
             <div class="form-group">
-                <input type="text" name="name" class="form-input" placeholder="Folder Name" required autofocus>
+                <label class="form-label">Folder Name</label>
+                <input type="text" name="name" class="form-input" placeholder="e.g. Design Assets" required autofocus>
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn btn-ghost" onclick="document.getElementById('modal-folder').style.display='none'">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="button" class="btn btn-ghost" onclick="hideModal('modal-folder')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Folder</button>
             </div>
         </form>
     </div>
@@ -112,5 +106,36 @@
     menuNew.addEventListener('click', (e) => {
         e.stopPropagation();
     });
+
+    function showModal(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+
+    function hideModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+    
+    // Re-initialize icons for dynamic content if needed
+    lucide.createIcons();
 </script>
+
+<style>
+    /* List-specific additional styles */
+    .dropdown-menu.show {
+        display: flex;
+        top: 100%;
+        right: 0;
+        margin-top: 8px;
+    }
+    
+    .item-icon-box i {
+        color: var(--primary);
+        opacity: 0.8;
+    }
+    
+    .item-card:hover .item-icon-box i {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+</style>
 {{ end }}

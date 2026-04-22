@@ -1,34 +1,28 @@
 {{ define "content" }}
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <h1 class="auth-title">Create an account</h1>
-            <p class="auth-subtitle">Start documenting with your team</p>
+<div class="auth-container max-w-md mx-auto py-20 animate-fade-in">
+    <div class="auth-card bg-white p-12 rounded-3xl shadow-2xl border border-slate-100 text-center">
+        <div class="mb-10">
+            <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-white text-3xl font-bold mx-auto mb-6 shadow-lg shadow-primary-glow">D</div>
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">Create Account</h1>
+            <p class="text-slate-400">Join the DocuFlow revolution</p>
         </div>
 
-        <form action="/register" method="POST">
-            <div class="form-group">
-                <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-input" placeholder="Choose a username" required>
+        <form action="/register" method="POST" class="text-left">
+            <div class="form-group mb-4">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Choose Username</label>
+                <input type="text" name="username" class="form-input w-full h-12 bg-slate-50 border-slate-200 rounded-xl px-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all" placeholder="yourname" required>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-input" placeholder="you@example.com" required>
+            <div class="form-group mb-8">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Secure Password</label>
+                <input type="password" name="password" class="form-input w-full h-12 bg-slate-50 border-slate-200 rounded-xl px-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all" placeholder="••••••••" required>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input type="password" name="password" class="form-input" placeholder="Create a strong password"
-                    required>
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: var(--space-4);">Create
-                Account</button>
+            <button type="submit" class="btn btn-primary w-full h-14 rounded-xl text-lg font-bold shadow-xl">Get Started</button>
         </form>
 
-        <div class="auth-footer">
-            Already have an account? <a href="/login">Sign in</a>
+        <div class="mt-10 pt-8 border-t border-slate-50 text-slate-400 text-sm">
+            Already have an account? <a href="/login" class="text-primary font-bold hover:underline">Sign in instead</a>
         </div>
     </div>
 </div>

@@ -1,50 +1,59 @@
 {{ define "content" }}
-<div class="page-header">
-    <h1 class="page-title">Search Documents</h1>
-    <p class="page-description" style="margin: 0;">Find documents by title or content</p>
-</div>
-
-<form action="/search" method="GET" class="search-form">
-    <span class="search-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-        </svg>
-    </span>
-    <input type="text" name="q" value="{{ .Query }}" class="search-input" placeholder="Search documents..." autofocus>
-</form>
-
-{{ if .Query }}
-<div class="card">
-    <div class="card-header">
-        <span class="card-title">Search Results</span>
-        <span class="text-sm text-muted">{{ len .Results }} results for "{{ .Query }}"</span>
+<div class="max-w-4xl mx-auto py-10">
+    <div class="mb-12 text-center">
+        <h1 class="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">Search Knowledge Base</h1>
+        <p class="text-slate-400">Find documents across your entire digital drive</p>
     </div>
 
-    {{ if .Results }}
-    <ul class="doc-list">
-        {{ range .Results }}
-        <li class="doc-item">
-            <div class="doc-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                </svg>
+    <form action="/search" method="GET" class="mb-12">
+        <div class="search-input-group relative">
+            <i data-lucide="search" class="search-icon absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size="24"></i>
+            <input type="text" name="q" value="{{ .Query }}" class="form-input w-full h-16 pl-16 pr-6 text-xl rounded-2xl shadow-lg border-slate-200 focus:ring-4 focus:ring-primary-glow transition-all" placeholder="Enter keywords..." autofocus>
+        </div>
+    </form>
+
+    {{ if .Query }}
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+        <div class="px-8 py-6 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Found {{ len .Results }} matches</h3>
+            <span class="text-xs font-medium text-slate-400 italic">Results for "{{ .Query }}"</span>
+        </div>
+
+        {{ if .Results }}
+        <ul class="divide-y divide-slate-50">
+            {{ range .Results }}
+            <li>
+                <a href="/documents/view?id={{ .ID }}" class="block p-8 hover:bg-slate-50 transition-colors group">
+                    <div class="flex items-start gap-5">
+                        <div class="w-12 h-12 bg-primary-light text-primary rounded-xl flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-all">
+                            <i data-lucide="file-text" size="24"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xl font-bold text-slate-900 mb-2 truncate group-hover:text-primary transition-colors">{{ .Title }}</h4>
+                            <p class="text-slate-500 line-clamp-2 text-sm leading-relaxed">{{ .Content }}</p>
+                        </div>
+                        <div class="text-slate-300 group-hover:text-primary transition-colors">
+                            <i data-lucide="arrow-right" size="20"></i>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            {{ end }}
+        </ul>
+        {{ else }}
+        <div class="p-20 text-center animate-fade-in">
+            <div class="w-20 h-20 bg-slate-100 rounded-3xl flex items-center justify-center text-slate-300 mx-auto mb-6">
+                <i data-lucide="search-x" size="40"></i>
             </div>
-            <div class="doc-content">
-                <a href="/documents/view?id={{ .ID }}" class="doc-title">{{ .Title }}</a>
-                <p class="doc-meta" style="margin-top: var(--space-2); color: var(--text-secondary);">{{ .Content }}</p>
-            </div>
-        </li>
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">No matches discovered</h3>
+            <p class="text-slate-400 max-w-xs mx-auto">Try refining your query or creating a new document to expand your reach.</p>
+        </div>
         {{ end }}
-    </ul>
-    {{ else }}
-    <div class="empty-state" style="padding: var(--space-10);">
-        <div class="empty-state-icon">🔍</div>
-        <h3 class="empty-state-title">No results found</h3>
-        <p class="empty-state-description">Try adjusting your search terms or create a new document.</p>
     </div>
     {{ end }}
 </div>
-{{ end }}
+
+<script>
+    lucide.createIcons();
+</script>
 {{ end }}

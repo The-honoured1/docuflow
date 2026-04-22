@@ -1,46 +1,67 @@
 {{ define "content" }}
-<div class="page-header flex justify-between items-center">
-    <div>
-        <h1 class="page-title">Version History</h1>
-        <p class="page-description" style="margin: 0;">{{ .Title }}</p>
+<div class="max-w-4xl mx-auto py-10">
+    <div class="flex justify-between items-end mb-10 pb-8 border-b border-slate-100">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">Version History</h1>
+            <p class="text-slate-500 flex items-center gap-2">
+                <i data-lucide="file-text" size="16"></i>
+                {{ .Title }}
+            </p>
+        </div>
+        <a href="/documents/view?id={{ .DocumentID }}" class="btn btn-secondary h-11">
+            <i data-lucide="arrow-left" size="18"></i>
+            Back to Document
+        </a>
     </div>
-    <a href="/documents/view?id={{ .DocumentID }}" class="btn btn-secondary">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="19" y1="12" x2="5" y2="12" />
-            <polyline points="12 19 5 12 12 5" />
-        </svg>
-        Back to Document
-    </a>
+
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+        {{ if .Revisions }}
+        <ul class="divide-y divide-slate-50">
+            {{ range .Revisions }}
+            <li class="p-6 hover:bg-slate-50/50 transition-colors">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-5">
+                        <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center font-bold">
+                            {{ slice .CreatedAt.Format "Jan" 0 1 | upper }}
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-800">{{ .CreatedAt.Format "January 02, 2006" }}</h4>
+                            <p class="text-sm text-slate-400 flex items-center gap-2">
+                                <i data-lucide="clock" size="14"></i>
+                                {{ .CreatedAt.Format "15:04" }} • {{ if .ChangeSummary }}{{ .ChangeSummary }}{{ else }}Manual Save{{ end }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="/revisions/view?id={{ .ID }}" class="btn btn-ghost h-10 px-4 text-sm gap-2">
+                            <i data-lucide="eye" size="16"></i>
+                            View
+                        </a>
+                        <form action="/revisions/rollback" method="POST" class="m-0">
+                            <input type="hidden" name="revision_id" value="{{ .ID }}">
+                            <button type="submit" class="btn bg-amber-50 text-amber-600 hover:bg-amber-100 h-10 px-4 text-sm gap-2 rounded-xl transition-all font-bold">
+                                <i data-lucide="rotate-ccw" size="16"></i>
+                                Restore
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+            {{ end }}
+        </ul>
+        {{ else }}
+        <div class="p-20 text-center">
+            <div class="w-20 h-20 bg-slate-100 rounded-3xl flex items-center justify-center text-slate-300 mx-auto mb-6">
+                <i data-lucide="history" size="40"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">Pristine State</h3>
+            <p class="text-slate-400 max-w-xs mx-auto">No previous versions have been archived yet. Changes will appear here automatically.</p>
+        </div>
+        {{ end }}
+    </div>
 </div>
 
-<div class="card">
-    {{ if .Revisions }}
-    <ul class="revision-list">
-        {{ range .Revisions }}
-        <li class="revision-item">
-            <div class="revision-info">
-                <div class="revision-avatar">R</div>
-                <div class="revision-details">
-                    <h4>{{ .CreatedAt.Format "January 02, 2006 at 15:04" }}</h4>
-                    <p>{{ if .ChangeSummary }}{{ .ChangeSummary }}{{ else }}Document revision{{ end }}</p>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <a href="/revisions/view?id={{ .ID }}" class="btn btn-ghost btn-sm">View</a>
-                <form action="/revisions/rollback" method="POST" style="margin: 0;">
-                    <input type="hidden" name="revision_id" value="{{ .ID }}">
-                    <button type="submit" class="btn btn-warning btn-sm">Restore</button>
-                </form>
-            </div>
-        </li>
-        {{ end }}
-    </ul>
-    {{ else }}
-    <div class="empty-state" style="padding: var(--space-10);">
-        <div class="empty-state-icon">📜</div>
-        <h3 class="empty-state-title">No revisions yet</h3>
-        <p class="empty-state-description">Revisions are created when you save changes to the document.</p>
-    </div>
-    {{ end }}
-</div>
+<script>
+    lucide.createIcons();
+</script>
 {{ end }}
