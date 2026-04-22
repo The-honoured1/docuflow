@@ -264,8 +264,10 @@ a:hover {
 
 .app-layout {
     display: flex;
+    width: 100%;
     min-height: 100vh;
     background: var(--bg-primary);
+    overflow-x: hidden;
 }
 
 .sidebar {
@@ -278,7 +280,7 @@ a:hover {
     top: 0;
     bottom: 0;
     left: 0;
-    z-index: 100;
+    z-index: 1000;
 }
 
 .sidebar-header {
@@ -304,10 +306,11 @@ a:hover {
     background: linear-gradient(135deg, var(--primary-500), var(--purple-500));
     color: white;
     border-radius: var(--radius-lg);
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 1rem;
+    font-weight: 700;
 }
 
 .sidebar-nav {
@@ -381,6 +384,8 @@ a:hover {
     margin-left: 260px;
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    width: calc(100% - 260px);
 }
 
 .top-bar {
@@ -411,7 +416,10 @@ a:hover {
 .search-icon {
     position: absolute;
     left: var(--space-4);
+    top: 50%;
+    transform: translateY(-50%);
     color: var(--text-tertiary);
+    pointer-events: none;
 }
 
 .search-input {
@@ -1280,6 +1288,31 @@ a:hover {
     margin-bottom: var(--space-6);
 }
 
+.mb-8 {
+    margin-bottom: var(--space-8);
+}
+
+.mb-10 {
+    margin-bottom: var(--space-10);
+}
+
+.mt-8 {
+    margin-top: var(--space-8);
+}
+
+.w-full {
+    width: 100%;
+}
+
+.max-w-7xl {
+    max-width: 80rem;
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
 /* ============================================
    ANIMATIONS
    ============================================ */
@@ -1804,6 +1837,9 @@ a:hover {
    ============================================ */
 
 .drive-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     border-bottom: 1px solid var(--border-light);
     padding-bottom: var(--space-4);
     margin-bottom: var(--space-6);
@@ -1958,7 +1994,7 @@ a:hover {
     display: none;
     flex-direction: column;
     padding: var(--space-2);
-    z-index: 200;
+    z-index: 2000;
 }
 
 .dropdown-menu.show {
