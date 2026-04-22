@@ -16,7 +16,7 @@ type UploadHandler struct {
 	DB *sql.DB
 }
 
-// UploadFile handles multipart file uploads attached to a document.
+// UploadFile handles multipart file uploads attached to a document or a folder.
 func (h *UploadHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -24,9 +24,10 @@ func (h *UploadHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	docID := r.FormValue("document_id")
-	if docID == "" {
-		http.Error(w, "Missing document_id", http.StatusBadRequest)
-		return
+	folderID := r.FormValue("folder_id")
+
+	if docID == "" && folderID == "" {
+		// Root upload as a standalone file
 	}
 
 	// Limit upload size to 50 MB
@@ -51,7 +52,16 @@ func (h *UploadHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	safeName := fmt.Sprintf("%s_%s%s", safeBase, timestamp, ext)
 
 	// Create upload directory
-	uploadDir := filepath.Join("uploads", docID)
+	// Use folder_id if docID is empty
+	dirName := docID
+	if dirName == "" {
+		dirName = "standalone"
+		if folderID != "" {
+			dirName = "folder_" + folderID
+		}
+	}
+
+	uploadDir := filepath.Join("uploads", dirName)
 	if err := os.MkdirAll(uploadDir, 0755); err != nil {
 		http.Error(w, "Server error creating upload directory", http.StatusInternalServerError)
 		return
@@ -77,18 +87,42 @@ func (h *UploadHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		mimeType = "application/octet-stream"
 	}
 
-	_, err = h.DB.Exec(
-		`INSERT INTO document_files (document_id, file_name, file_path, mime_type, file_size) VALUES (?, ?, ?, ?, ?)`,
-		docID, originalName, destPath, mimeType, written,
-	)
+	var res sql.Result
+	if docID != "" {
+		res, err = h.DB.Exec(
+			`INSERT INTO document_files (document_id, file_name, file_path, mime_type, file_size) VALUES (?, ?, ?, ?, ?)`,
+			docID, originalName, destPath, mimeType, written,
+		)
+	} else {
+		if folderID == "" {
+			res, err = h.DB.Exec(
+				`INSERT INTO document_files (file_name, file_path, mime_type, file_size) VALUES (?, ?, ?, ?)`,
+				originalName, destPath, mimeType, written,
+			)
+		} else {
+			res, err = h.DB.Exec(
+				`INSERT INTO document_files (folder_id, file_name, file_path, mime_type, file_size) VALUES (?, ?, ?, ?, ?)`,
+				folderID, originalName, destPath, mimeType, written,
+			)
+		}
+	}
+
 	if err != nil {
 		os.Remove(destPath)
 		http.Error(w, "Failed to record file in database", http.StatusInternalServerError)
 		return
 	}
 
-	// Return updated file list partial via HTMX
-	http.Redirect(w, r, "/documents/view?id="+docID, http.StatusSeeOther)
+	// Redirect
+	if docID != "" {
+		http.Redirect(w, r, "/documents/view?id="+docID, http.StatusSeeOther)
+	} else {
+		dest := "/"
+		if folderID != "" {
+			dest = "/?folder_id=" + folderID
+		}
+		http.Redirect(w, r, dest, http.StatusSeeOther)
+	}
 }
 
 // DeleteFile removes an uploaded file from disk and the database.
@@ -173,15 +207,15 @@ func GetDocumentFiles(db *sql.DB, docID string) ([]map[string]interface{}, error
 			"ID":         id,
 			"FileName":   fileName,
 			"MimeType":   mimeType,
-			"FileSize":   humanFileSize(fileSize),
+			"FileSize":   HumanFileSize(fileSize),
 			"UploadedAt": uploadedAt.Format("Jan 02, 2006"),
-			"Icon":       fileIcon(mimeType),
+			"Icon":       FileIcon(mimeType),
 		})
 	}
 	return files, nil
 }
 
-func humanFileSize(b int64) string {
+func HumanFileSize(b int64) string {
 	const unit = 1024
 	if b < unit {
 		return fmt.Sprintf("%d B", b)
@@ -194,7 +228,7 @@ func humanFileSize(b int64) string {
 	return fmt.Sprintf("%.1f %cB", float64(b)/float64(div), "KMGTPE"[exp])
 }
 
-func fileIcon(mimeType string) string {
+func FileIcon(mimeType string) string {
 	switch {
 	case strings.HasPrefix(mimeType, "image/"):
 		return "🖼️"

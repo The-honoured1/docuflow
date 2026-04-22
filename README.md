@@ -100,7 +100,7 @@ docuflow/
 │       ├── share_view.html      # Public share view
 │       ├── login.html           # Authentication
 │       ├── register.html
-│       ├── search.html
+│       ├── search.html 
 │       ├── revisions.html
 │       └── partials/
 │           └── comments.html    # Comment component

@@ -1,74 +1,117 @@
 {{ define "content" }}
-<div class="page-header flex justify-between items-center">
-    <div>
-        <h1 class="page-title">Documents</h1>
-        <p class="page-description" style="margin: 0;">Your team's knowledge base</p>
-    </div>
-    <a href="/documents/new" class="btn btn-primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        New Document
-    </a>
-</div>
-
-<div class="card">
-    {{ if .Documents }}
-    <ul class="doc-list">
-        {{ range .Documents }}
-        <li class="doc-item">
-            <div class="doc-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                </svg>
-            </div>
-            <div class="doc-content">
-                <div class="doc-title-row">
-                    <a href="/documents/view?id={{ .ID }}" class="doc-title">{{ .Title }}</a>
-                    <div class="doc-badges">
-                        {{ if .IsShared }}
-                        <span class="doc-badge doc-badge--shared" title="Public share link active">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                                <polyline points="16 6 12 2 8 6"/>
-                                <line x1="12" y1="2" x2="12" y2="15"/>
-                            </svg>
-                            Shared
-                        </span>
-                        {{ end }}
-                        {{ if .IsProtected }}
-                        <span class="doc-badge doc-badge--locked" title="Password protected">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                            </svg>
-                            Protected
-                        </span>
-                        {{ end }}
-                    </div>
-                </div>
-                <span class="doc-meta">Updated {{ .UpdatedAt.Format "Jan 02, 2006 at 15:04" }}</span>
-            </div>
-            <a href="/documents/edit?id={{ .ID }}" class="btn btn-ghost btn-sm">Edit</a>
-        </li>
-        {{ end }}
-    </ul>
-    {{ else }}
-    <div class="empty-state">
-        <div class="empty-state-icon">📄</div>
-        <h3 class="empty-state-title">No documents yet</h3>
-        <p class="empty-state-description">Create your first document to get started with your team's knowledge base.
-        </p>
-        <a href="/documents/new" class="btn btn-primary">
+<div class="drive-header flex justify-between items-center mb-8">
+    <div class="breadcrumbs">
+        <a href="/" class="breadcrumb-item">My Drive</a>
+        {{ if .CurrentFolderID }}
+        <span class="breadcrumb-separator">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6" />
+            </svg>
+        </span>
+        <span class="breadcrumb-item current">{{ .CurrentFolderName }}</span>
+        {{ end }}
+    </div>
+
+    <div class="drive-actions dropdown-container">
+        <button class="btn btn-primary" id="btn-new">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Create Document
-        </a>
+            New
+        </button>
+        <div class="dropdown-menu" id="new-dropdown">
+            <a href="#" class="dropdown-item" onclick="document.getElementById('modal-folder').style.display='flex'">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                </svg>
+                New Folder
+            </a>
+            <hr>
+            <a href="/documents/new{{ if .CurrentFolderID }}?folder_id={{ .CurrentFolderID }}{{ end }}" class="dropdown-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+                New Document
+            </a>
+            <a href="#" class="dropdown-item" onclick="document.getElementById('file-upload').click()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                File Upload
+            </a>
+        </div>
+        <form id="upload-form" action="/documents/upload" method="POST" enctype="multipart/form-data" style="display: none;">
+            <input type="file" name="file" id="file-upload" onchange="this.form.submit()">
+            <input type="hidden" name="folder_id" value="{{ .CurrentFolderID }}">
+        </form>
+    </div>
+</div>
+
+{{ if .Items }}
+<div class="drive-grid">
+    {{ range .Items }}
+    <div class="item-card" {{ if eq .Type "folder" }} ondblclick="window.location.href='/?folder_id={{ .ID }}'" {{ else if eq .Type "document" }} ondblclick="window.location.href='/documents/view?id={{ .ID }}'" {{ else }} ondblclick="window.location.href='/files/download?file_id={{ .ID }}'" {{ end }}>
+        <div class="item-icon-wrapper {{ .Type }}">
+            <span class="item-icon">{{ .Icon }}</span>
+        </div>
+        <div class="item-info">
+            <span class="item-name" title="{{ .Name }}">{{ .Name }}</span>
+            <div class="item-meta">
+                {{ if .IsShared }}
+                <span class="badge shared">Shared</span>
+                {{ end }}
+                <span class="item-date">{{ .UpdatedAt }}</span>
+            </div>
+        </div>
     </div>
     {{ end }}
 </div>
+{{ else }}
+<div class="empty-drive">
+    <div class="empty-icon">📁</div>
+    <h3>No files yet</h3>
+    <p>Upload a file or create a document to get started.</p>
+</div>
+{{ end }}
+
+<!-- New Folder Modal -->
+<div class="modal" id="modal-folder">
+    <div class="modal-content">
+        <h3>New Folder</h3>
+        <form action="/folders/new" method="POST">
+            <input type="hidden" name="parent_id" value="{{ .CurrentFolderID }}">
+            <div class="form-group">
+                <input type="text" name="name" class="form-input" placeholder="Folder Name" required autofocus>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" onclick="document.getElementById('modal-folder').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // New Dropdown Logic
+    const btnNew = document.getElementById('btn-new');
+    const menuNew = document.getElementById('new-dropdown');
+
+    btnNew.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuNew.classList.toggle('show');
+    });
+
+    document.addEventListener('click', () => {
+        menuNew.classList.remove('show');
+    });
+
+    menuNew.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+</script>
+{{ end }}
 {{ end }}

@@ -1,48 +1,123 @@
 {{ define "content" }}
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">{{ if .ID }}Edit Document{{ else }}New Document{{ end }}</h2>
-        <span id="save-status" class="save-indicator"></span>
+<div class="doc-editor-container">
+    <div class="doc-editor-header">
+        <div class="doc-editor-title-group">
+            <a href="{{ if .FolderID }}/?folder_id={{ .FolderID }}{{ else }}/{{ end }}" class="btn-back">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12" />
+                    <polyline points="12 19 5 12 12 5" />
+                </svg>
+            </a>
+            <input type="text" form="doc-form" name="title" value="{{ .Title }}" class="doc-title-input" placeholder="Untitled Document" required autofocus>
+        </div>
+        <div class="doc-editor-actions">
+            <span id="save-status" class="save-indicator"></span>
+            <button type="submit" form="doc-form" class="btn btn-primary">
+                {{ if .ID }}Save changes{{ else }}Create Doc{{ end }}
+            </button>
+        </div>
     </div>
 
-    <div class="card-body">
-        <form action="{{ if .ID }}/documents/edit?id={{ .ID }}{{ else }}/documents/new{{ end }}" method="POST">
-            <div class="form-group">
-                <label class="form-label">Title</label>
-                <input type="text" name="title" value="{{ .Title }}" class="form-input"
-                    placeholder="Enter document title..." required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Content</label>
-                <p class="form-hint" style="margin-top: 0; margin-bottom: var(--space-2);">Write your content using
-                    Markdown syntax</p>
-                <textarea name="content" id="content-editor" class="form-textarea" placeholder="# Getting Started
-
-Write your documentation here using **Markdown** syntax.
-
-- Use headings to structure content
-- Add code blocks with syntax highlighting
-- Create lists, tables, and more" {{ if .ID }} hx-post="/documents/autosave" hx-trigger="keyup changed delay:2s"
-                    hx-vals='{"id": "{{ .ID }}"}' hx-target="#save-status" {{ end }} required>{{ .Content }}</textarea>
-            </div>
-
-            <div class="flex gap-3">
-                <button type="submit" class="btn btn-primary">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                        <polyline points="17 21 17 13 7 13 7 21" />
-                        <polyline points="7 3 7 8 15 8" />
-                    </svg>
-                    Save Document
-                </button>
-                {{ if .ID }}
-                <a href="/documents/view?id={{ .ID }}" class="btn btn-secondary">Cancel</a>
-                {{ else }}
-                <a href="/" class="btn btn-secondary">Cancel</a>
-                {{ end }}
+    <div class="doc-editor-workspace">
+        <form id="doc-form" action="{{ if .ID }}/documents/edit?id={{ .ID }}{{ else }}/documents/new{{ end }}" method="POST">
+            <input type="hidden" name="folder_id" value="{{ .FolderID }}">
+            <div class="doc-page">
+                <textarea name="content" id="content-editor" class="doc-content-textarea" placeholder="Start typing..." {{ if .ID }} hx-post="/documents/autosave" hx-trigger="keyup changed delay:2s" hx-vals='{"id": "{{ .ID }}"}' hx-target="#save-status" {{ end }} required>{{ .Content }}</textarea>
             </div>
         </form>
     </div>
 </div>
+
+<style>
+.doc-editor-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+}
+
+.doc-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) 0;
+    margin-bottom: var(--space-6);
+}
+
+.doc-editor-title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex: 1;
+}
+
+.doc-title-input {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    width: 100%;
+}
+
+.doc-title-input:focus {
+    outline: none;
+}
+
+.doc-editor-workspace {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-8) 0;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
+    display: flex;
+    justify-content: center;
+}
+
+.doc-page {
+    background: var(--surface);
+    width: 100%;
+    max-width: 850px;
+    min-height: 100%;
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-16) var(--space-12);
+    border-radius: var(--radius-sm);
+}
+
+.doc-content-textarea {
+    width: 100%;
+    min-height: 1000px;
+    border: none;
+    resize: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+}
+
+.doc-content-textarea:focus {
+    outline: none;
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+}
+
+.btn-back:hover {
+    background: var(--gray-200);
+    color: var(--text-primary);
+}
+
+.save-indicator {
+    font-size: 0.8125rem;
+    color: var(--text-tertiary);
+    font-weight: 500;
+}
+</style>
 {{ end }}

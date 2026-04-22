@@ -12,48 +12,88 @@
 </head>
 
 <body>
-    <nav class="navbar">
-        <div class="navbar-inner">
-            <a href="/" class="navbar-brand">
-                <span class="navbar-logo">D</span>
-                DocuFlow
-            </a>
-
-            <div class="navbar-nav">
-                <a href="/" class="nav-link">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                        <polyline points="10 9 9 9 8 9" />
-                    </svg>
-                    Documents
-                </a>
-                <a href="/search" class="nav-link">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.35-4.35" />
-                    </svg>
-                    Search
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="brand">
+                    <span class="brand-logo">D</span>
+                    <span class="brand-text">DocuFlow</span>
                 </a>
             </div>
 
-            <div class="navbar-actions">
-                {{ if .User }}
-                <span class="text-sm text-muted">{{ .User }}</span>
-                <a href="/logout" class="btn btn-secondary btn-sm">Logout</a>
-                {{ else }}
-                <a href="/login" class="nav-link">Login</a>
-                <a href="/register" class="btn btn-primary btn-sm">Get Started</a>
-                {{ end }}
+            <nav class="sidebar-nav">
+                <a href="/" class="sidebar-link active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    </svg>
+                    My Drive
+                </a>
+                <a href="/recent" class="sidebar-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    Recent
+                </a>
+                <a href="/starred" class="sidebar-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                    Starred
+                </a>
+                <a href="/trash" class="sidebar-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                    Trash
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="storage-card">
+                    <div class="storage-info">
+                        <span>Storage</span>
+                        <span>75% used</span>
+                    </div>
+                    <div class="storage-bar">
+                        <div class="storage-usage" style="width: 75%;"></div>
+                    </div>
+                    <a href="#" class="btn btn-ghost btn-sm">Upgrade Plan</a>
+                </div>
             </div>
+        </aside>
+
+        <div class="main-wrapper">
+            <header class="top-bar">
+                <div class="search-container">
+                    <form action="/search" method="GET" class="search-form">
+                        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.35-4.35" />
+                        </svg>
+                        <input type="text" name="q" placeholder="Search in Drive" class="search-input">
+                    </form>
+                </div>
+
+                <div class="top-bar-actions">
+                    {{ if .User }}
+                    <div class="user-profile">
+                        <span class="user-name">{{ .User }}</span>
+                        <a href="/logout" class="btn btn-ghost btn-sm">Logout</a>
+                    </div>
+                    {{ else }}
+                    <a href="/login" class="btn btn-ghost btn-sm">Login</a>
+                    <a href="/register" class="btn btn-primary btn-sm">Get Started</a>
+                    {{ end }}
+                </div>
+            </header>
+
+            <main class="content-area">
+                {{ template "content" . }}
+            </main>
         </div>
-    </nav>
-
-    <main class="main-container animate-fade-in">
-        {{ template "content" . }}
-    </main>
+    </div>
 </body>
 
 </html>

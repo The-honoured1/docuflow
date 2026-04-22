@@ -41,9 +41,13 @@ func main() {
 	commentHandler := &handlers.CommentHandler{DB: database}
 	searchHandler := &handlers.SearchHandler{DB: database}
 	uploadHandler := &handlers.UploadHandler{DB: database}
+	folderHandler := &handlers.FolderHandler{DB: database}
+
+	// Drive / Folder routes
+	mux.HandleFunc("/", folderHandler.DriveView)
+	mux.HandleFunc("/folders/new", folderHandler.CreateFolder)
 
 	// Document routes
-	mux.HandleFunc("/", docHandler.ListDocuments)
 	mux.HandleFunc("/documents/new", docHandler.NewDocument)
 	mux.HandleFunc("/documents/view", docHandler.ViewDocument)
 	mux.HandleFunc("/documents/edit", docHandler.EditDocument)

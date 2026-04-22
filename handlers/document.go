@@ -57,17 +57,43 @@ func (h *DocumentHandler) ListDocuments(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *DocumentHandler) NewDocument(w http.ResponseWriter, r *http.Request) {
+	folderID := r.URL.Query().Get("folder_id")
+
 	if r.Method == "GET" {
 		tmpl := template.Must(template.ParseFiles("web/templates/base.html", "web/templates/document_edit.html"))
-		tmpl.Execute(w, GetBaseData(r))
+		
+		var folderIDPtr *int
+		if folderID != "" {
+			// Basic validation/parsing could go here
+		}
+
+		tmpl.Execute(w, struct {
+			User     string
+			FolderID string
+			models.Document
+		}{
+			User:     GetBaseData(r).User,
+			FolderID: folderID,
+		})
 		return
 	}
 
 	title := r.FormValue("title")
+	if title == "" {
+		title = "Untitled Document"
+	}
 	content := r.FormValue("content")
+	folderIDPost := r.FormValue("folder_id")
 	ownerID := 1
 
-	res, err := h.DB.Exec("INSERT INTO documents (title, content, owner_id) VALUES (?, ?, ?)", title, content, ownerID)
+	var res sql.Result
+	var err error
+	if folderIDPost == "" {
+		res, err = h.DB.Exec("INSERT INTO documents (title, content, owner_id) VALUES (?, ?, ?)", title, content, ownerID)
+	} else {
+		res, err = h.DB.Exec("INSERT INTO documents (title, content, owner_id, folder_id) VALUES (?, ?, ?, ?)", title, content, ownerID, folderIDPost)
+	}
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

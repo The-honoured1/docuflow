@@ -18,6 +18,7 @@ type Document struct {
 	Title         string    `json:"title"`
 	Content       string    `json:"content"`
 	OwnerID       int       `json:"owner_id"`
+	FolderID      *int      `json:"folder_id"` // NULL if root
 	ShareToken    string    `json:"share_token"`
 	SharePassword string    `json:"-"`
 	CreatedAt     time.Time `json:"created_at"`
@@ -33,9 +34,18 @@ type Revision struct {
 	ChangeSummary string    `json:"change_summary"`
 }
 
+type Folder struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	ParentID  *int      `json:"parent_id"` // NULL if root
+	OwnerID   int       `json:"owner_id"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type DocumentFile struct {
 	ID         int       `json:"id"`
-	DocumentID int       `json:"document_id"`
+	DocumentID *int      `json:"document_id"` // Now optional
+	FolderID   *int      `json:"folder_id"`   // New: for standalone files
 	FileName   string    `json:"file_name"`
 	FilePath   string    `json:"file_path"`
 	MimeType   string    `json:"mime_type"`
