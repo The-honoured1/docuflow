@@ -111,23 +111,18 @@ func (h *FolderHandler) DriveView(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	data := GetBaseData(r)
+	data.Items = items
+	data.CurrentFolderID = folderID
+	data.CurrentFolderName = currentFolderName
+	data.ParentFolderID = parentID
+	data.View = "drive"
+	data.Query = "" // Initialize to handle template field requirements
+
 	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
-	tmpl.Execute(w, struct {
-		User              string
-		Items             []DriveItem
-		CurrentFolderID   string
-		CurrentFolderName string
-		ParentFolderID    sql.NullInt64
-		View              string
-	}{
-		User:              GetBaseData(r).User,
-		Items:             items,
-		CurrentFolderID:   folderID,
-		CurrentFolderName: currentFolderName,
-		ParentFolderID:    parentID,
-		View:              "drive",
-	})
+	tmpl.Execute(w, data)
 }
+
 
 func (h *FolderHandler) CreateFolder(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {

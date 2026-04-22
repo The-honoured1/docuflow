@@ -16,13 +16,10 @@ func (h *SearchHandler) Search(w http.ResponseWriter, r *http.Request) {
 
 	if query == "" {
 		tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
-		tmpl.Execute(w, struct {
-			User  string
-			Query string
-		}{
-			User:  GetBaseData(r).User,
-			Query: "",
-		})
+		data := GetBaseData(r)
+		data.Query = ""
+		data.View = "search"
+		tmpl.Execute(w, data)
 		return
 	}
 
@@ -52,16 +49,12 @@ func (h *SearchHandler) Search(w http.ResponseWriter, r *http.Request) {
 		results = append(results, d)
 	}
 
+	data := GetBaseData(r)
+	data.Query = query
+	data.Results = results
+	data.View = "search"
+
 	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
-	tmpl.Execute(w, struct {
-		User    string
-		Query   string
-		Results []models.Document
-		View    string
-	}{
-		User:    GetBaseData(r).User,
-		Query:   query,
-		Results: results,
-		View:    "search",
-	})
+	tmpl.Execute(w, data)
 }
+

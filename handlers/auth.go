@@ -17,14 +17,11 @@ type AuthHandler struct {
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
-		tmpl.Execute(w, struct {
-			User string
-			View string
-		}{
-			User: GetBaseData(r).User,
-			View: "register",
-		})
+		data := GetBaseData(r)
+		data.View = "register"
+		tmpl.Execute(w, data)
 		return
+
 	}
 
 	username := r.FormValue("username")
@@ -51,14 +48,11 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
-		tmpl.Execute(w, struct {
-			User string
-			View string
-		}{
-			User: GetBaseData(r).User,
-			View: "login",
-		})
+		data := GetBaseData(r)
+		data.View = "login"
+		tmpl.Execute(w, data)
 		return
+
 	}
 
 	username := r.FormValue("username")

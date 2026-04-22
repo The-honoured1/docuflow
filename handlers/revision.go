@@ -41,21 +41,15 @@ func (h *RevisionHandler) ListRevisions(w http.ResponseWriter, r *http.Request) 
 	h.DB.QueryRow("SELECT title FROM documents WHERE id = ?", docID).Scan(&title)
 
 	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
-	data := struct {
-		User       string
-		DocumentID string
-		Title      string
-		Revisions  []models.Revision
-		View       string
-	}{
-		User:       GetBaseData(r).User,
-		DocumentID: docID,
-		Title:      title,
-		Revisions:  revisions,
-		View:       "revisions",
-	}
+	data := GetBaseData(r)
+	data.DocumentID = docID
+	data.Title = title
+	data.Revisions = revisions
+	data.View = "revisions"
+
 	tmpl.Execute(w, data)
 }
+
 
 func (h *RevisionHandler) ViewRevision(w http.ResponseWriter, r *http.Request) {
 	revID := r.URL.Query().Get("id")
@@ -75,19 +69,17 @@ func (h *RevisionHandler) ViewRevision(w http.ResponseWriter, r *http.Request) {
 	h.DB.QueryRow("SELECT title FROM documents WHERE id = ?", rev.DocumentID).Scan(&title)
 
 	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
-	data := struct {
-		User     string
-		Title    string
-		Revision models.Revision
-		View     string
-	}{
-		User:     GetBaseData(r).User,
-		Title:    title,
-		Revision: rev,
-		View:     "revision_view",
-	}
+	data := GetBaseData(r)
+	data.Title = title
+	data.Document = models.Document{
+		ID:      rev.DocumentID,
+		Content: rev.Content,
+	} // Using Document field to hold revision content for template compatibility
+	data.View = "revision_view"
+
 	tmpl.Execute(w, data)
 }
+
 
 func (h *RevisionHandler) Rollback(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
