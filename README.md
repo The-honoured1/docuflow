@@ -126,67 +126,6 @@ docuflow/
 | **Auth** | bcrypt | Secure password hashing |
 | **Styling** | Vanilla CSS | Modern design system with Inter font |
 
-## 📊 Database Schema
-
-```sql
--- Users table
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    role TEXT DEFAULT 'editor',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- Documents table
-CREATE TABLE documents (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    content TEXT,
-    owner_id INTEGER,
-    share_token TEXT UNIQUE,
-    share_password TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(owner_id) REFERENCES users(id)
-);
-
--- Document files (attachments)
-CREATE TABLE document_files (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    document_id INTEGER NOT NULL,
-    file_name TEXT NOT NULL,
-    file_path TEXT NOT NULL,
-    mime_type TEXT,
-    file_size INTEGER,
-    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(document_id) REFERENCES documents(id)
-);
-
--- Revisions table (version history)
-CREATE TABLE revisions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    document_id INTEGER,
-    content TEXT,
-    editor_id INTEGER,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    change_summary TEXT,
-    FOREIGN KEY(document_id) REFERENCES documents(id),
-    FOREIGN KEY(editor_id) REFERENCES users(id)
-);
-
--- Comments table
-CREATE TABLE comments (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    document_id INTEGER,
-    user_id INTEGER,
-    content TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(document_id) REFERENCES documents(id),
-    FOREIGN KEY(user_id) REFERENCES users(id)
-);
-```
 ## 🎨 Design System
 
 DocuFlow features a premium, industry-standard design system:
