@@ -16,7 +16,7 @@
                 <div class="brand-icon"></div>
                 DocuFlow
             </div>
-            
+
             <form action="/{{ .View }}" method="POST" style="display: flex; flex-direction: column; gap: 24px;">
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <label style="font-size: 13px; font-weight: 700; color: var(--text-dim);">Username</label>
@@ -53,7 +53,7 @@
                 <div class="brand-icon"></div>
                 DocuFlow
             </a>
-            
+
             <div class="nav-group">
                 <div class="nav-label">Drive</div>
                 <nav>
@@ -182,16 +182,16 @@
                                 <div style="font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em;">Direct Neural State</div>
                                 <div id="autosave-status" style="font-size: 11px; font-weight: 700; color: var(--text-dim);">All states committed</div>
                             </div>
-                            <textarea 
-                                name="content" 
-                                class="editor-textarea" 
+                            <textarea
+                                name="content"
+                                class="editor-textarea"
                                 placeholder="Begin inputting intelligence..."
                                 hx-post="/documents/autosave"
                                 hx-trigger="keyup changed delay:1s"
                                 hx-vals='js:{id: "{{ .Document.ID }}"}'
                                 hx-target="#autosave-status"
                             >{{ .Document.Content }}</textarea>
-                            
+
                             {{ if eq .View "document_view" }}
                             <div hx-get="/comments?doc_id={{ .Document.ID }}" hx-trigger="load" hx-swap="innerHTML" style="margin-top: 80px;"></div>
                             {{ end }}
@@ -219,7 +219,7 @@
                             <!-- Sharing Panel -->
                             <div class="solid-panel">
                                 <div class="solid-panel-title"><i data-lucide="share-2" size="18"></i> Security & Sharing</div>
-                                
+
                                 {{ if .ShareURL }}
                                 <div class="solid-field-group">
                                     <label class="solid-field-label">Nexus Endpoint</label>
@@ -260,7 +260,7 @@
                             <!-- Attachments Panel -->
                             <div class="solid-panel">
                                 <div class="solid-panel-title"><i data-lucide="paperclip" size="18"></i> Neural Attachments</div>
-                                
+
                                 <div style="margin-bottom: 24px;">
                                     {{ if .Files }}
                                         {{ range .Files }}
@@ -286,7 +286,6 @@
                                 </form>
                             </div>
                         </aside>
-                        {{ end }}
                     </div>
                 {{ else if or (eq .View "document_new") (eq .View "document_edit") }}
                     <!-- Redirected to unified view if needed, but keeping for direct access -->
@@ -364,7 +363,7 @@
 {{ define "comments" }}
 <div style="margin-top: 80px; padding-top: 40px; border-top: 1px solid var(--border);">
     <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 32px;">Commits ({{ len .Comments }})</h3>
-    
+
     <form hx-post="/comments/add" hx-target="closest div" hx-swap="outerHTML" style="margin-bottom: 40px;">
         <input type="hidden" name="document_id" value="{{ .DocumentID }}">
         <textarea name="content" class="search-field" style="width: 100%; min-height: 80px; padding: 12px; border-radius: var(--radius); resize: none; background: var(--surface);" placeholder="Append to discussion..." required></textarea>
